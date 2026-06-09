@@ -24,7 +24,7 @@ import { UsersModule } from './users/users.module';
       useFactory: (config: ConfigService) => ({
         uri: config.get<string>(
           'MONGO_URI',
-          'mongodb://localhost:27017/haggag',
+          'mongodb://127.0.0.1:27018/haggag',
         ),
       }),
     }),

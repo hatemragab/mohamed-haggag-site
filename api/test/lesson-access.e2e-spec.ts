@@ -5,7 +5,7 @@
  * Runs against a real MongoDB (docker) using a dedicated database that is
  * dropped before and after the run.
  */
-process.env.MONGO_URI = 'mongodb://localhost:27017/haggag_e2e';
+process.env.MONGO_URI = 'mongodb://127.0.0.1:27018/haggag_e2e';
 process.env.JWT_ACCESS_SECRET = 'e2e-access-secret';
 process.env.JWT_REFRESH_SECRET = 'e2e-refresh-secret';
 
@@ -208,5 +208,37 @@ describe('Lesson access rule (e2e)', () => {
       .get('/admin/overview')
       .set('Cookie', studentCookies)
       .expect(403);
+  });
+
+  // Regression guard: Mongoose 9 stopped casting string ids on ref paths —
+  // these endpoints filter by category/user from query/body strings.
+  it('admin lesson listing + reorder and student order history work', async () => {
+    const login = await agent()
+      .post('/auth/admin/login')
+      .send({ identifier: 'e2e-admin', password: 'admin123' })
+      .expect(201);
+    const adminCookies = login.get('Set-Cookie') ?? [];
+
+    const list = await agent()
+      .get(`/lessons?categoryId=${categoryId}&levelKey=lvl1`)
+      .set('Cookie', adminCookies)
+      .expect(200);
+    expect(list.body).toHaveLength(2);
+    expect(list.body[0].youtubeId).toBe(FREE_YT);
+
+    const reversed = [lockedLessonId, freeLessonId];
+    const reordered = await agent()
+      .patch('/lessons/reorder')
+      .set('Cookie', adminCookies)
+      .send({ categoryId, levelKey: 'lvl1', orderedIds: reversed })
+      .expect(200);
+    expect(reordered.body.map((l: { id: string }) => l.id)).toEqual(reversed);
+
+    const mine = await agent()
+      .get('/orders/mine')
+      .set('Cookie', studentCookies)
+      .expect(200);
+    expect(mine.body).toHaveLength(1);
+    expect(mine.body[0].status).toBe('paid');
   });
 });

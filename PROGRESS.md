@@ -31,35 +31,35 @@ Living checklist. Updated every work cycle.
 - [x] Design tokens, global CSS, Tajawal+Amiri via next/font, RTL layout, Arabic metadata/OG
 - [x] Shared UI: Icon, Btn, Badge, Counter, Ornament, Header, Footer, CategoryCard, Field
 - [x] API client + auth context (cookies, /auth/me)
-- [ ] Home (hero, stats, why, learn, courses grid, steps, testimonials, FAQ preview, CTA) — all from API
-- [ ] Courses catalog (search + level filter)
-- [ ] Category page (group tabs, level accordions, lock/free badges, buy card)
-- [ ] Lesson player (gated youtubeId fetch, sidebar playlist, prev/next, mark complete, continue-watching)
-- [ ] Pricing (3 plans, currency switcher) + Checkout (mock, processing→success) 
-- [ ] Auth pages (register/login split layout)
-- [ ] Student dashboard (stats, continue watching, my courses, suggestions)
-- [ ] About / FAQ / Contact / Terms — from API
-- [ ] `pnpm build` + lint clean
+- [x] Home (hero, stats, why, learn, courses grid, steps, testimonials, FAQ preview, CTA) — all from API
+- [x] Courses catalog (search + level filter)
+- [x] Category page (group tabs, level accordions, lock/free badges, buy card)
+- [x] Lesson player (gated youtubeId fetch, sidebar playlist, prev/next, mark complete, continue-watching)
+- [x] Pricing (3 plans, currency switcher) + Checkout (mock, processing→success) 
+- [x] Auth pages (register/login split layout)
+- [x] Student dashboard (stats, continue watching, my courses, suggestions)
+- [x] About / FAQ / Contact / Terms — from API
+- [x] `pnpm build` + lint clean
 
 ## Phase 3 — Admin (port 3001, dark navy)
 - [x] Admin login (admin/admin123) + guard (client redirect + API role guard)
 - [x] Shell: sidebar tabs, remember last tab, Esc closes modals, mobile topbar
-- [ ] Overview (KPIs, revenue per currency, latest payments, displayed stats)
-- [ ] Categories & levels (CRUD + levels modal incl. groups)
-- [ ] Videos & lessons (cascading selectors, thumbnails, live link validation + preview, embed playback modal, reorder, free toggle)
-- [ ] General content (hero, instructor, stats, prices, + NEW editors: FAQ, why-cards, learn list, access steps, contact info, terms)
-- [ ] Testimonials (CRUD + ordering + first-3 badge)
-- [ ] Students (search, status toggle, add, delete)
-- [ ] Payments (list, delete)
-- [ ] `pnpm build` + lint clean
+- [x] Overview (KPIs, revenue per currency, latest payments, displayed stats)
+- [x] Categories & levels (CRUD + levels modal incl. groups)
+- [x] Videos & lessons (cascading selectors, thumbnails, live link validation + preview, embed playback modal, reorder, free toggle)
+- [x] General content (hero, instructor, stats, prices, + NEW editors: FAQ, why-cards, learn list, access steps, contact info, terms)
+- [x] Testimonials (CRUD + ordering + first-3 badge)
+- [x] Students (search, status toggle, add, delete)
+- [x] Payments (list, delete)
+- [x] `pnpm build` + lint clean
 
 ## Phase 4 — Verification (Definition of Done)
-- [ ] `docker compose up -d` + `pnpm seed` + three dev servers boot, zero errors
-- [ ] All three `build` + lint pass, zero errors
-- [ ] Site renders 100% from API (no hardcoded content)
-- [ ] e2e: locked youtubeId never leaks; free + purchased lessons play
-- [ ] Mock checkout unlocks end-to-end; order appears in admin payments
-- [ ] Every content area editable in admin; edits reflect on site after refresh
-- [ ] Admin auth guards /admin (client + API)
-- [ ] Root README (architecture diagram, env vars, getting started)
-- [ ] Final commit
+- [x] `docker compose up -d` + `pnpm seed` + three dev servers boot, zero errors
+- [x] All three `build` + lint pass, zero errors
+- [x] Site renders 100% from API (no hardcoded content)
+- [x] e2e: locked youtubeId never leaks; free + purchased lessons play
+- [x] Mock checkout unlocks end-to-end; order appears in admin payments
+- [x] Every content area editable in admin; edits reflect on site after refresh
+- [x] Admin auth guards /admin (client + API)
+- [x] Root README (architecture diagram, env vars, getting started)
+- [x] Final commit

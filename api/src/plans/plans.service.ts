@@ -22,7 +22,14 @@ export class PlansService {
 
   async update(key: PlanKey, dto: UpdatePlanDto) {
     const plan = await this.byKey(key);
-    if (dto.prices) plan.prices = { ...plan.prices, ...dto.prices };
+    // Spreading a Mongoose subdocument yields internals, not values — merge per field.
+    if (dto.prices) {
+      plan.prices = {
+        AED: dto.prices.AED ?? plan.prices.AED,
+        EGP: dto.prices.EGP ?? plan.prices.EGP,
+        USD: dto.prices.USD ?? plan.prices.USD,
+      };
+    }
     if (dto.name !== undefined) plan.name = dto.name;
     if (dto.tagline !== undefined) plan.tagline = dto.tagline;
     if (dto.period !== undefined) plan.period = dto.period;

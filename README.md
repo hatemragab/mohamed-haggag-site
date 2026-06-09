@@ -8,7 +8,7 @@ Built from the hi-fi prototype in [`mohammed-haggag-courses_UI/`](mohammed-hagga
 
 ```
                         ┌──────────────────────────────┐
-                        │   MongoDB (docker, :27017)    │
+                        │   MongoDB (docker, :27018)    │
                         │   + mongo-express (:8081)     │
                         └──────────────▲───────────────┘
                                        │ Mongoose
@@ -65,7 +65,7 @@ Copied automatically from the committed `.env` / `.env.local` defaults; `.env.ex
 | var | default | purpose |
 |---|---|---|
 | `PORT` | `4000` | API port |
-| `MONGO_URI` | `mongodb://localhost:27017/haggag` | database |
+| `MONGO_URI` | `mongodb://127.0.0.1:27018/haggag` | database |
 | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | dev values | sign tokens — change in prod |
 | `WEB_ORIGIN` / `ADMIN_ORIGIN` | `http://localhost:3000` / `:3001` | CORS allow-list |
 | `COOKIE_SECURE` | `false` | set `true` behind HTTPS |

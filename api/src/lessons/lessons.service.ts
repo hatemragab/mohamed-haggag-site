@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Category, CategoryDocument } from '../categories/category.schema';
 import { JwtUser } from '../common/decorators/current-user.decorator';
 import { extractYoutubeId } from '../common/utils/youtube';
@@ -42,8 +42,13 @@ export class LessonsService {
 
   /** Admin listing for one level — the only list endpoint that exposes youtubeId. */
   async adminList(categoryId: string, levelKey: string, groupKey?: string) {
+    // Mongoose 9 no longer casts string ids on ref paths in filters — cast explicitly.
     const list = await this.lessons
-      .find({ category: categoryId, groupKey: groupKey ?? null, levelKey })
+      .find({
+        category: new Types.ObjectId(categoryId),
+        groupKey: groupKey ?? null,
+        levelKey,
+      })
       .sort({ order: 1 })
       .exec();
     return list.map((l) => this.adminView(l));
@@ -181,7 +186,11 @@ export class LessonsService {
   async reorder(dto: ReorderLessonsDto) {
     const groupKey = dto.groupKey ?? null;
     const list = await this.lessons
-      .find({ category: dto.categoryId, groupKey, levelKey: dto.levelKey })
+      .find({
+        category: new Types.ObjectId(dto.categoryId),
+        groupKey,
+        levelKey: dto.levelKey,
+      })
       .exec();
     const byId = new Map(list.map((l) => [l._id.toString(), l]));
     if (
@@ -203,7 +212,7 @@ export class LessonsService {
     levelKey: string,
   ) {
     const list = await this.lessons
-      .find({ category: categoryId, groupKey, levelKey })
+      .find({ category: new Types.ObjectId(categoryId), groupKey, levelKey })
       .sort({ order: 1 })
       .exec();
     await Promise.all(

@@ -107,8 +107,9 @@ export class OrdersService {
   }
 
   async mine(userId: string) {
+    // ref-path filters need explicit ObjectId casting under Mongoose 9
     const list = await this.orders
-      .find({ user: userId })
+      .find({ user: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
       .exec();
     return list.map((o) => this.view(o));

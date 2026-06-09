@@ -24,7 +24,7 @@ import {
 } from './seed-data';
 
 async function main() {
-  const uri = process.env.MONGO_URI ?? 'mongodb://localhost:27017/haggag';
+  const uri = process.env.MONGO_URI ?? 'mongodb://127.0.0.1:27018/haggag';
   await mongoose.connect(uri);
   console.log(`✔ connected to ${uri}`);
 
