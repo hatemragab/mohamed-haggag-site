@@ -1,0 +1,13 @@
+{
+  "name": "haggag-academy",
+  "private": true,
+  "scripts": {
+    "seed": "pnpm --dir api seed",
+    "dev": "concurrently -n api,web,admin -c yellow,cyan,magenta \"pnpm --dir api start:dev\" \"pnpm --dir web dev\" \"pnpm --dir admin dev\"",
+    "build": "pnpm --dir api build && pnpm --dir web build && pnpm --dir admin build",
+    "lint": "pnpm --dir api lint && pnpm --dir web lint && pnpm --dir admin lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

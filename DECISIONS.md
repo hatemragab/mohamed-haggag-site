@@ -1,0 +1,17 @@
+# DECISIONS — judgment calls made autonomously
+
+1. **Prototype path**: mission says `./prototype/` but the actual folder is `./mohammed-haggag-courses_UI/` — used as-is, not renamed (it is the design reference, untouched).
+2. **Workspace layout**: 3 independent pnpm projects (`/api`, `/web`, `/admin`) + a root `package.json` with convenience scripts (`pnpm seed`, `pnpm dev`) that delegate into the projects — keeps the "exactly 3 sibling projects" rule while giving the one-command DX the DoD asks for.
+3. **Framework versions**: used what the official CLIs scaffold today (NestJS 11, Next.js 15, Tailwind v4) rather than pinning older majors — CLAUDE.md mentioned Nest 10/Next 14 but the mission says to use the official CLI; newest stable wins.
+4. **Styling strategy**: ported the prototype's inline-style + CSS-custom-properties approach verbatim (tokens in `globals.css`) instead of rewriting every style as Tailwind classes — guarantees pixel fidelity and matches the prototype's code style; Tailwind is installed and used for layout utilities where convenient.
+5. **DB modeling**: Category embeds its `groups[]`/`levels[]` (small, bounded, edited together in one admin modal). Lessons are a separate collection keyed by `categoryId + groupId? + levelId` with an `order` field — they're unbounded and reordered independently.
+6. **Admin credentials**: kept the prototype's `admin / admin123` as the seeded admin (User with `username: "admin"`, role `admin`). Students log in by email; the admin login endpoint accepts username or email.
+7. **Auth sessions**: single active refresh token per user (hash stored on the user doc, rotated on refresh). Multi-device sessions are out of scope for MVP.
+8. **Seeded lessons**: replicated the prototype's deterministic `genLessons()` (5–8 lessons per level, 12–40 min, titles from the 8 templates, first lesson free, demo YouTube id `aqz-KE-bpKQ`) so seeded content matches the prototype exactly.
+9. **FAQ / why-cards / learn list / access steps / contact / terms** had no admin editor in the prototype → modeled them inside the SiteContent singleton and ADDED editors for all of them in the admin "المحتوى العام" tab (mission rule: every content area must be editable).
+10. **Lesson gating shape**: public endpoints never include `youtubeId`. A dedicated `GET /lessons/:id/watch` returns it only for free lessons, unlocked users, or admins. The e2e test asserts the id never appears anywhere in public payloads.
+11. **Checkout flow**: `POST /orders` (pending) → provider adapter `createPayment` → `POST /orders/:id/pay` (mock confirm) → order `paid` + unlock. Mirrors a real PSP redirect/webhook shape while staying mock. Both `paymob` and `stripe` adapters implement one `PaymentProvider` interface and always succeed.
+12. **Admin-created students**: the add-student modal requires the admin to set an initial password (prototype had no password concept). Plan column in the students table is derived from the user's latest paid order.
+13. **e2e tests** run against a real MongoDB (the docker instance) using a separate `haggag_e2e` database that is dropped per run — avoids the mongodb-memory-server binary download and tests the real driver path.
+14. **Continue-watching** is stored server-side on the user (last 8, deduped by lesson), matching the prototype's localStorage behavior but cross-device.
+15. **Currency on checkout**: order stores `amount + currency` snapshotted from the plan at purchase time (prices may be edited later in admin; historical orders keep what was actually charged).
