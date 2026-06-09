@@ -35,7 +35,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         /* localStorage may be unavailable */
       }
     }
-    setOpenM(false);
   }, [pathname]);
 
   const item = (t: (typeof TABS)[number]) => {
@@ -115,6 +114,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={t.href}
                 href={t.href}
+                onClick={() => setOpenM(false)}
                 style={{ display: "block", width: "100%", textAlign: "right", padding: "12px", color: pathname.startsWith(t.href) ? "var(--gold-400)" : "var(--text-soft)", fontWeight: 700 }}
               >
                 {t.label}

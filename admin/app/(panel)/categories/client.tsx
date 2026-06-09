@@ -43,17 +43,17 @@ export default function CategoriesClient() {
   const [formErr, setFormErr] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoadErr(null);
-    try {
-      setCats(await apiGet<CategoryListItem[]>("/categories"));
-    } catch (e) {
-      setLoadErr(errMsg(e));
-    }
+  const load = useCallback(() => {
+    apiGet<CategoryListItem[]>("/categories")
+      .then((list) => {
+        setCats(list);
+        setLoadErr(null);
+      })
+      .catch((e: unknown) => setLoadErr(errMsg(e)));
   }, []);
 
   useEffect(() => {
-    void load();
+    load();
   }, [load]);
 
   const openNew = () => { setForm(blank); setFormErr(null); setEdit({ mode: "new" }); };
@@ -71,7 +71,7 @@ export default function CategoriesClient() {
       if (edit.mode === "new") await apiPost<unknown>("/categories", form);
       else await apiPatch<unknown>(`/categories/${edit.cat.id}`, form);
       setEdit(null);
-      await load();
+      load();
     } catch (e) {
       setFormErr(errMsg(e));
     } finally {
@@ -107,7 +107,7 @@ export default function CategoriesClient() {
           <AdminHead title="الأقسام والمستويات" />
           <ACard style={{ textAlign: "center" }}>
             <div style={{ color: "var(--bad)", fontSize: "14.5px", marginBottom: "14px" }}>{loadErr}</div>
-            <ABtn tone="ghost" onClick={() => void load()}>إعادة المحاولة</ABtn>
+            <ABtn tone="ghost" onClick={load}>إعادة المحاولة</ABtn>
           </ACard>
         </>
       );
@@ -203,17 +203,17 @@ function SubsModal({
   const [adding, setAdding] = useState<string | null>(null); // group key (أو "main")
   const [val, setVal] = useState({ title: "", note: "" });
 
-  const loadDetail = useCallback(async () => {
-    setErr(null);
-    try {
-      setDetail(await apiGet<CategoryDetail>(`/categories/${cat.slug}`));
-    } catch (e) {
-      setErr(errMsg(e));
-    }
+  const loadDetail = useCallback(() => {
+    apiGet<CategoryDetail>(`/categories/${cat.slug}`)
+      .then((d) => {
+        setDetail(d);
+        setErr(null);
+      })
+      .catch((e: unknown) => setErr(errMsg(e)));
   }, [cat.slug]);
 
   useEffect(() => {
-    void loadDetail();
+    loadDetail();
   }, [loadDetail]);
 
   const groups: GroupView[] = detail
@@ -276,7 +276,7 @@ function SubsModal({
       )}
       {!detail ? (
         err ? (
-          <ABtn tone="ghost" onClick={() => void loadDetail()}>إعادة المحاولة</ABtn>
+          <ABtn tone="ghost" onClick={loadDetail}>إعادة المحاولة</ABtn>
         ) : (
           <div style={{ display: "grid", placeItems: "center", padding: "30px 0" }}>
             <div className="ring" />
