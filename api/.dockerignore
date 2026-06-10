@@ -1,0 +1,16 @@
+# keep pnpm-lock.yaml IN the context (needed for --frozen-lockfile)
+node_modules
+dist
+coverage
+test
+.env
+.env.*
+*.log
+.git
+.gitignore
+Dockerfile
+.dockerignore
+README.md
+CLAUDE.md
+AGENTS.md
+.DS_Store

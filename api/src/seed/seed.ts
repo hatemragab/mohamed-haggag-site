@@ -36,13 +36,17 @@ async function main() {
   const SiteContent = mongoose.model('SiteContent', SiteContentSchema);
 
   // --- admin user (upsert; students are never touched) ---
-  const passwordHash = await bcrypt.hash(ADMIN_USER.password, 10);
+  // Production: set ADMIN_USERNAME / ADMIN_EMAIL / ADMIN_PASSWORD env vars.
+  const adminUsername = process.env.ADMIN_USERNAME ?? ADMIN_USER.username;
+  const adminEmail = process.env.ADMIN_EMAIL ?? ADMIN_USER.email;
+  const adminPassword = process.env.ADMIN_PASSWORD ?? ADMIN_USER.password;
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   await User.updateOne(
-    { username: ADMIN_USER.username },
+    { username: adminUsername },
     {
       $set: {
         name: ADMIN_USER.name,
-        email: ADMIN_USER.email,
+        email: adminEmail,
         passwordHash,
         role: 'admin',
         status: 'active',
@@ -56,7 +60,11 @@ async function main() {
     },
     { upsert: true },
   );
-  console.log(`✔ admin user (${ADMIN_USER.username} / ${ADMIN_USER.password})`);
+  console.log(`✔ admin user (${adminUsername})`);
+  if (adminPassword === ADMIN_USER.password)
+    console.warn(
+      '⚠ admin uses the DEFAULT password — set ADMIN_PASSWORD and re-seed before going live',
+    );
 
   // --- categories + generated lessons ---
   await Category.deleteMany({});

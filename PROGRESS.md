@@ -63,3 +63,14 @@ Living checklist. Updated every work cycle.
 - [x] Admin auth guards /admin (client + API)
 - [x] Root README (architecture diagram, env vars, getting started)
 - [x] Final commit
+
+## Phase 5 — Production readiness
+- [x] Browser console clean: zero errors/warnings across site + admin (strict Playwright audit incl. logged-in + admin interactive flows)
+- [x] Fail-fast env validation in production (secrets, origins, Mongo URI)
+- [x] Brute-force rate limiting on auth endpoints (verified: 11th login attempt → 429)
+- [x] Helmet security headers, /health probe, graceful shutdown, TRUST_PROXY + SWAGGER_ENABLED + COOKIE_SAMESITE switches
+- [x] Seed admin credentials from env (ADMIN_PASSWORD) + default-password warning
+- [x] Dockerfiles (api/web/admin, multi-stage, non-root) + docker-compose.prod.yml + .env.prod.example
+- [x] Web polish: favicon, robots.txt, dynamic sitemap, Arabic error + 404 pages
+- [x] Admin polish: favicon, Arabic error + 404 pages
+- [x] README production deployment section

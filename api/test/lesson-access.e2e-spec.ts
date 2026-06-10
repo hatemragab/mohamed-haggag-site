@@ -23,6 +23,22 @@ import { Plan, PlanDocument } from '../src/plans/plan.schema';
 const SECRET_YT = 'LOCKEDyt001'; // 11 chars — the id that must never leak
 const FREE_YT = 'FREEyt00001';
 
+interface WatchRes {
+  youtubeId: string;
+}
+interface OrderRes {
+  id: string;
+  status: string;
+}
+interface AdminOrderRow {
+  status: string;
+  student: string;
+}
+interface LessonRow {
+  id: string;
+  youtubeId: string;
+}
+
 describe('Lesson access rule (e2e)', () => {
   let app: INestApplication;
   let conn: Connection;
@@ -32,7 +48,8 @@ describe('Lesson access rule (e2e)', () => {
   let lockedLessonId: string;
   let studentCookies: string[];
 
-  const agent = () => request(app.getHttpServer());
+  const agent = () =>
+    request(app.getHttpServer() as Parameters<typeof request>[0]);
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -41,7 +58,9 @@ describe('Lesson access rule (e2e)', () => {
 
     app = moduleRef.createNestApplication();
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     conn = app.get<Connection>(getConnectionToken());
@@ -118,7 +137,7 @@ describe('Lesson access rule (e2e)', () => {
 
   it('anonymous user can watch the free lesson', async () => {
     const res = await agent().get(`/lessons/${freeLessonId}/watch`).expect(200);
-    expect(res.body.youtubeId).toBe(FREE_YT);
+    expect((res.body as WatchRes).youtubeId).toBe(FREE_YT);
   });
 
   it('anonymous user cannot watch the locked lesson', async () => {
@@ -157,19 +176,20 @@ describe('Lesson access rule (e2e)', () => {
         provider: 'stripe',
       })
       .expect(201);
-    expect(order.body.status).toBe('pending');
+    const orderBody = order.body as OrderRes;
+    expect(orderBody.status).toBe('pending');
 
     const paid = await agent()
-      .post(`/orders/${order.body.id}/pay`)
+      .post(`/orders/${orderBody.id}/pay`)
       .set('Cookie', studentCookies)
       .expect(201);
-    expect(paid.body.status).toBe('paid');
+    expect((paid.body as OrderRes).status).toBe('paid');
 
     const res = await agent()
       .get(`/lessons/${lockedLessonId}/watch`)
       .set('Cookie', studentCookies)
       .expect(200);
-    expect(res.body.youtubeId).toBe(SECRET_YT);
+    expect((res.body as WatchRes).youtubeId).toBe(SECRET_YT);
   });
 
   it('the paid order shows up in the admin payments list', async () => {
@@ -198,9 +218,10 @@ describe('Lesson access rule (e2e)', () => {
       .get('/orders')
       .set('Cookie', adminCookies)
       .expect(200);
-    expect(orders.body).toHaveLength(1);
-    expect(orders.body[0].status).toBe('paid');
-    expect(orders.body[0].student).toBe('طالب الاختبار');
+    const rows = orders.body as AdminOrderRow[];
+    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBe('paid');
+    expect(rows[0].student).toBe('طالب الاختبار');
   });
 
   it('a student cannot access admin endpoints', async () => {
@@ -223,8 +244,9 @@ describe('Lesson access rule (e2e)', () => {
       .get(`/lessons?categoryId=${categoryId}&levelKey=lvl1`)
       .set('Cookie', adminCookies)
       .expect(200);
-    expect(list.body).toHaveLength(2);
-    expect(list.body[0].youtubeId).toBe(FREE_YT);
+    const lessonRows = list.body as LessonRow[];
+    expect(lessonRows).toHaveLength(2);
+    expect(lessonRows[0].youtubeId).toBe(FREE_YT);
 
     const reversed = [lockedLessonId, freeLessonId];
     const reordered = await agent()
@@ -232,13 +254,14 @@ describe('Lesson access rule (e2e)', () => {
       .set('Cookie', adminCookies)
       .send({ categoryId, levelKey: 'lvl1', orderedIds: reversed })
       .expect(200);
-    expect(reordered.body.map((l: { id: string }) => l.id)).toEqual(reversed);
+    expect((reordered.body as LessonRow[]).map((l) => l.id)).toEqual(reversed);
 
     const mine = await agent()
       .get('/orders/mine')
       .set('Cookie', studentCookies)
       .expect(200);
-    expect(mine.body).toHaveLength(1);
-    expect(mine.body[0].status).toBe('paid');
+    const mineRows = mine.body as OrderRes[];
+    expect(mineRows).toHaveLength(1);
+    expect(mineRows[0].status).toBe('paid');
   });
 });

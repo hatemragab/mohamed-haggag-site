@@ -46,12 +46,12 @@ export class AuthService {
       await bcrypt.hash(refreshToken, 10),
     );
     const secure = process.env.COOKIE_SECURE === 'true';
-    const base = {
-      httpOnly: true,
-      sameSite: 'lax' as const,
-      secure,
-      path: '/',
-    };
+    // 'lax' works when web/admin/api share a registrable domain;
+    // set COOKIE_SAMESITE=none (+ COOKIE_SECURE=true) for cross-domain setups.
+    const sameSiteEnv = process.env.COOKIE_SAMESITE;
+    const sameSite: 'lax' | 'strict' | 'none' =
+      sameSiteEnv === 'none' || sameSiteEnv === 'strict' ? sameSiteEnv : 'lax';
+    const base = { httpOnly: true, sameSite, secure, path: '/' };
     res.cookie('access_token', accessToken, { ...base, maxAge: ACCESS_TTL_MS });
     res.cookie('refresh_token', refreshToken, {
       ...base,

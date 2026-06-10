@@ -1,0 +1,83 @@
+# Production stack — Mongo + API + student site + admin panel.
+#
+#   cp .env.prod.example .env.prod        # then fill in REAL values
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#
+# Mongo is NOT published to the host; only the three apps are. Put a reverse
+# proxy with TLS (nginx / Caddy / Traefik) in front of ports 3000/3001/4000.
+
+name: haggag-prod
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: haggag_prod_mongo
+    restart: unless-stopped
+    # No host port on purpose — reachable only on the compose network.
+    volumes:
+      - mongo_prod_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api:
+    build: ./api
+    container_name: haggag_prod_api
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      MONGO_URI: mongodb://mongo:27017/haggag
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set JWT_ACCESS_SECRET in .env.prod}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env.prod}
+      WEB_ORIGIN: ${WEB_ORIGIN:?set WEB_ORIGIN in .env.prod}
+      ADMIN_ORIGIN: ${ADMIN_ORIGIN:?set ADMIN_ORIGIN in .env.prod}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      SWAGGER_ENABLED: "false"
+      # Used by the seed (docker compose exec api node dist/seed/seed.js)
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    ports:
+      - "4000:4000"
+
+  web:
+    build:
+      context: ./web
+      args:
+        # Baked into the browser bundle at build time — rebuild to change.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL in .env.prod}
+        NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:?set NEXT_PUBLIC_ADMIN_URL in .env.prod}
+    container_name: haggag_prod_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      # Server-side fetches go straight to the API over the compose network
+      # (runtime-configurable — no rebuild needed).
+      API_URL: http://api:4000
+    ports:
+      - "3000:3000"
+
+  admin:
+    build:
+      context: ./admin
+      args:
+        # Baked into the browser bundle at build time — rebuild to change.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL in .env.prod}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:?set NEXT_PUBLIC_SITE_URL in .env.prod}
+    container_name: haggag_prod_admin
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3001:3001"
+
+volumes:
+  mongo_prod_data:
