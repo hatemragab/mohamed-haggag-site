@@ -14,11 +14,19 @@ export class ApiError extends Error {
   }
 }
 
+/** Read the locale cookie (set by LocaleProvider) so API errors come back localized. */
+function currentLocale(): "ar" | "en" {
+  if (typeof document === "undefined") return "ar";
+  const m = /(?:^|;\s*)mh_locale=([^;]+)/.exec(document.cookie);
+  return m?.[1] === "en" ? "en" : "ar";
+}
+
 async function raw(path: string, init: RequestInit = {}): Promise<Response> {
   return fetch(`${API_URL}${path}`, {
     credentials: "include",
     ...init,
     headers: {
+      "Accept-Language": currentLocale(),
       ...(init.body ? { "Content-Type": "application/json" } : {}),
       ...init.headers,
     },
@@ -26,7 +34,10 @@ async function raw(path: string, init: RequestInit = {}): Promise<Response> {
 }
 
 async function toError(res: Response): Promise<ApiError> {
-  let message = "حدث خطأ غير متوقع";
+  let message =
+    currentLocale() === "en"
+      ? "An unexpected error occurred"
+      : "حدث خطأ غير متوقع";
   try {
     const body = (await res.json()) as { message?: string | string[] };
     if (Array.isArray(body.message)) message = body.message[0];

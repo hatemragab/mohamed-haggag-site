@@ -5,17 +5,18 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { MK } from '../../i18n/messages';
 
 export class RegisterDto {
   @IsString()
-  @MinLength(3, { message: 'يرجى إدخال الاسم كاملاً' })
+  @MinLength(3, { message: MK.nameMin })
   name: string;
 
-  @IsEmail({}, { message: 'بريد إلكتروني غير صحيح' })
+  @IsEmail({}, { message: MK.email })
   email: string;
 
   @IsString()
-  @MinLength(6, { message: 'كلمة المرور ٦ أحرف على الأقل' })
+  @MinLength(6, { message: MK.passwordMin })
   password: string;
 
   @IsOptional()
@@ -24,21 +25,21 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  @IsEmail({}, { message: 'بريد إلكتروني غير صحيح' })
+  @IsEmail({}, { message: MK.email })
   email: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'أدخل كلمة المرور' })
+  @IsNotEmpty({ message: MK.passwordRequired })
   password: string;
 }
 
 export class AdminLoginDto {
   /** Username or email — the prototype admin signs in as «admin». */
   @IsString()
-  @IsNotEmpty({ message: 'أدخل اسم المستخدم' })
+  @IsNotEmpty({ message: MK.usernameRequired })
   identifier: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'أدخل كلمة المرور' })
+  @IsNotEmpty({ message: MK.passwordRequired })
   password: string;
 }

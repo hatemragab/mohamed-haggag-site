@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { serverApi } from "@/lib/api";
+import { getDict } from "@/lib/i18n/dictionaries";
+import { getServerLocale } from "@/lib/locale";
 import type { CategoryListItem, Plan } from "@/lib/types";
 import { CheckoutClient } from "./checkout-client";
 
-export const metadata: Metadata = { title: "إتمام الدفع" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDict(await getServerLocale());
+  return { title: t.checkout.metaTitle };
+}
 
 export default async function CheckoutPage({
   searchParams,

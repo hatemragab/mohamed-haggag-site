@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { MK } from '../i18n/messages';
 import { Lesson, LessonDocument } from '../lessons/lesson.schema';
 import { Category, CategoryDocument, LevelSub } from './category.schema';
 import {
@@ -54,13 +55,13 @@ export class CategoriesService {
 
   async findBySlug(slug: string): Promise<CategoryDocument> {
     const cat = await this.categories.findOne({ slug }).exec();
-    if (!cat) throw new NotFoundException('القسم غير موجود');
+    if (!cat) throw new NotFoundException(MK.categoryNotFound);
     return cat;
   }
 
   async findById(id: string): Promise<CategoryDocument> {
     const cat = await this.categories.findById(id).exec();
-    if (!cat) throw new NotFoundException('القسم غير موجود');
+    if (!cat) throw new NotFoundException(MK.categoryNotFound);
     return cat;
   }
 
@@ -147,7 +148,7 @@ export class CategoriesService {
   private levelArray(cat: CategoryDocument, groupKey?: string): LevelSub[] {
     if (cat.groups && cat.groups.length > 0) {
       const group = cat.groups.find((g) => g.key === groupKey);
-      if (!group) throw new BadRequestException('المجموعة غير موجودة');
+      if (!group) throw new BadRequestException(MK.groupNotFound);
       return group.levels;
     }
     return cat.levels;
@@ -171,7 +172,7 @@ export class CategoriesService {
     const cat = await this.findById(id);
     const arr = this.levelArray(cat, dto.groupKey);
     const lvl = arr.find((l) => l.key === levelKey);
-    if (!lvl) throw new NotFoundException('المستوى غير موجود');
+    if (!lvl) throw new NotFoundException(MK.levelNotFound);
     if (dto.title !== undefined) lvl.title = dto.title.trim();
     if (dto.note !== undefined) lvl.note = dto.note;
     cat.markModified('groups');
@@ -184,7 +185,7 @@ export class CategoriesService {
     const cat = await this.findById(id);
     const arr = this.levelArray(cat, groupKey);
     const idx = arr.findIndex((l) => l.key === levelKey);
-    if (idx === -1) throw new NotFoundException('المستوى غير موجود');
+    if (idx === -1) throw new NotFoundException(MK.levelNotFound);
     arr.splice(idx, 1);
     cat.markModified('groups');
     cat.markModified('levels');

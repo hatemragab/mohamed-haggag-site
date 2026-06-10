@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { arNum } from "@/lib/types";
+import { useLocale } from "./locale-context";
 
 /* ===== أيقونات خطّية بسيطة — منقولة من النموذج الأولي ===== */
 export type IconName =
@@ -186,6 +186,7 @@ export function Counter({
   dur?: number;
 }) {
   const [n, setN] = useState(0);
+  const { num } = useLocale();
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     let raf = 0;
@@ -224,7 +225,7 @@ export function Counter({
   }, [value, dur]);
   return (
     <span ref={ref}>
-      {arNum(n)}
+      {num(n)}
       {suffix}
     </span>
   );

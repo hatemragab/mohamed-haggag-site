@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useLocale } from "@/components/locale-context";
 
 /**
  * حدود الخطأ الجذرية — تُعرض خارج تخطيط (site) فلا رأس ولا تذييل هنا.
@@ -14,6 +15,7 @@ export default function RootError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useLocale();
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -53,10 +55,10 @@ export default function RootError({
             lineHeight: 1.4,
           }}
         >
-          حدث خطأ غير متوقع
+          {t.errors.title}
         </h1>
         <p style={{ color: "var(--ink-2)", fontSize: "16px", marginBottom: "28px" }}>
-          نعتذر عن هذا الخلل. يمكنك إعادة المحاولة، وإذا استمرت المشكلة فعُد إلى الصفحة الرئيسية.
+          {t.errors.description}
         </p>
         <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
           <button
@@ -71,7 +73,7 @@ export default function RootError({
               boxShadow: "var(--shadow-sm)",
             }}
           >
-            إعادة المحاولة
+            {t.errors.retry}
           </button>
           <Link
             href="/"
@@ -85,7 +87,7 @@ export default function RootError({
               fontSize: "15px",
             }}
           >
-            العودة للرئيسية
+            {t.errors.backHome}
           </Link>
         </div>
       </div>

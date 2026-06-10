@@ -8,6 +8,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { MK } from '../../i18n/messages';
 
 export class CreateLessonDto {
   @IsMongoId()
@@ -21,7 +22,7 @@ export class CreateLessonDto {
   levelKey: string;
 
   @IsString()
-  @MinLength(1, { message: 'أدخل عنوان الدرس' })
+  @MinLength(1, { message: MK.lessonTitleRequired })
   title: string;
 
   /** Full YouTube URL or bare 11-char id — the id is extracted server-side. */
@@ -29,7 +30,7 @@ export class CreateLessonDto {
   youtube: string;
 
   @IsNumber()
-  @Min(1, { message: 'المدة دقيقة واحدة على الأقل' })
+  @Min(1, { message: MK.durationMin })
   durationMinutes: number;
 
   @IsOptional()

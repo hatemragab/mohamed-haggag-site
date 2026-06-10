@@ -5,6 +5,7 @@ import { IsEmail, IsString, MinLength } from 'class-validator';
 import { Model } from 'mongoose';
 import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { MK } from '../i18n/messages';
 import {
   ContactMessage,
   ContactMessageDocument,
@@ -12,14 +13,14 @@ import {
 
 class ContactDto {
   @IsString()
-  @MinLength(2, { message: 'أدخل اسمك' })
+  @MinLength(2, { message: MK.yourNameRequired })
   name: string;
 
-  @IsEmail({}, { message: 'بريد إلكتروني غير صحيح' })
+  @IsEmail({}, { message: MK.email })
   email: string;
 
   @IsString()
-  @MinLength(5, { message: 'اكتب رسالتك' })
+  @MinLength(5, { message: MK.messageRequired })
   message: string;
 }
 

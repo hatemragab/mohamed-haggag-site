@@ -74,3 +74,12 @@ Living checklist. Updated every work cycle.
 - [x] Web polish: favicon, robots.txt, dynamic sitemap, Arabic error + 404 pages
 - [x] Admin polish: favicon, Arabic error + 404 pages
 - [x] README production deployment section
+
+## Phase 6 — Internationalization (public web: Arabic default + English)
+- [x] API: hardcoded Arabic exception/validation messages → keyed `{ar,en}` catalog (`api/src/i18n/messages.ts`) + global `I18nExceptionFilter`, Arabic default, EN via `?lang`/`Accept-Language` (verified live; build + lint + e2e 9/9 green; gating intact)
+- [x] Web: `LocaleProvider` + `useLocale()` (cookie-backed), root layout drives `lang`/`dir`/font + localized metadata, Inter font for Latin, browser client sends `Accept-Language`
+- [x] Web dictionaries: `lib/i18n/{ar,en}/<area>.ts` split per page-area, compile-time key-parity (`satisfies Record<Locale, Dict>`)
+- [x] All ~327 hardcoded UI strings translated across header/footer + 14 page-areas; API/DB content intentionally stays Arabic; numbers locale-aware
+- [x] Header AR/EN toggle; RTL↔LTR direction flip
+- [x] Verified: `tsc --noEmit` clean, eslint clean, Playwright sweep of all public routes in AR + EN → zero console errors, dir/lang correct, localized API errors, toggle works
+- [ ] (optional) Production `next build` — run with the dev stack stopped (host `.next` is shared with `next dev`)

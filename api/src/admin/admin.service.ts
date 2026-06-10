@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { Model } from 'mongoose';
 import { Category, CategoryDocument } from '../categories/category.schema';
+import { MK } from '../i18n/messages';
 import { LessonsService } from '../lessons/lessons.service';
 import { OrdersService } from '../orders/orders.service';
 import { SiteContentService } from '../site-content/site-content.service';
@@ -74,8 +75,7 @@ export class AdminService {
     const existing = await this.users
       .findOne({ email: dto.email.toLowerCase() })
       .exec();
-    if (existing)
-      throw new ConflictException('هذا البريد الإلكتروني مسجّل بالفعل');
+    if (existing) throw new ConflictException(MK.emailTaken);
     await this.users.create({
       name: dto.name.trim(),
       email: dto.email.toLowerCase(),
@@ -89,9 +89,9 @@ export class AdminService {
 
   async toggleStatus(id: string) {
     const user = await this.users.findById(id).exec();
-    if (!user) throw new NotFoundException('الطالب غير موجود');
+    if (!user) throw new NotFoundException(MK.studentNotFound);
     if (user.role !== 'student')
-      throw new BadRequestException('لا يمكن تعديل حالة هذا الحساب');
+      throw new BadRequestException(MK.cannotModifyAccount);
     user.status = user.status === 'active' ? 'suspended' : 'active';
     await user.save();
     return { id, status: user.status };
@@ -99,9 +99,9 @@ export class AdminService {
 
   async removeStudent(id: string) {
     const user = await this.users.findById(id).exec();
-    if (!user) throw new NotFoundException('الطالب غير موجود');
+    if (!user) throw new NotFoundException(MK.studentNotFound);
     if (user.role !== 'student')
-      throw new BadRequestException('لا يمكن حذف هذا الحساب');
+      throw new BadRequestException(MK.cannotDeleteAccount);
     await user.deleteOne();
     return { ok: true };
   }

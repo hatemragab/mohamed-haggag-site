@@ -4,21 +4,49 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "./auth-context";
+import { useLocale } from "./locale-context";
 import { Btn, Icon } from "./ui";
 
-const LINKS = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/courses", label: "الكورسات" },
-  { href: "/pricing", label: "الباقات والأسعار" },
-  { href: "/about", label: "عن الأستاذ" },
-  { href: "/faq", label: "الأسئلة الشائعة" },
-  { href: "/contact", label: "تواصل معنا" },
+const NAV = [
+  { href: "/", key: "home" },
+  { href: "/courses", key: "courses" },
+  { href: "/pricing", key: "pricing" },
+  { href: "/about", key: "about" },
+  { href: "/faq", key: "faq" },
+  { href: "/contact", key: "contact" },
 ] as const;
+
+/** AR/EN switch — label shows the language you'd switch TO, in its own script. */
+function LangToggle({
+  label,
+  onToggle,
+  full,
+}: {
+  label: string;
+  onToggle: () => void;
+  full?: boolean;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      title={label}
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "7px",
+        height: 38, padding: "0 14px", width: full ? "100%" : "auto",
+        borderRadius: "999px", background: "var(--cream-2)", color: "var(--navy-800)",
+        fontWeight: 700, fontSize: "14px",
+      }}
+    >
+      <Icon name="globe" size={16} /> {label}
+    </button>
+  );
+}
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { t, locale, toggle } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -31,6 +59,9 @@ export function Header() {
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  // The toggle shows the language you'd switch TO, in its own script.
+  const otherLabel = locale === "ar" ? "English" : "العربية";
 
   return (
     <header
@@ -47,14 +78,14 @@ export function Header() {
           <span style={{ width: "44px", height: "44px", borderRadius: "13px", background: "linear-gradient(150deg,var(--navy-700),var(--navy-900))", display: "grid", placeItems: "center", boxShadow: "var(--shadow-sm)", position: "relative", overflow: "hidden" }}>
             <span className="serif" style={{ color: "var(--gold-400)", fontSize: "24px", fontWeight: 700, lineHeight: 1 }}>م</span>
           </span>
-          <span style={{ textAlign: "right", lineHeight: 1.2 }}>
-            <span style={{ display: "block", fontWeight: 800, fontSize: "16px", color: "var(--navy-900)" }}>الأستاذ محمد حجاج</span>
-            <span style={{ display: "block", fontSize: "11.5px", color: "var(--gold-700)", fontWeight: 700 }}>منصة تعليمية أزهرية</span>
+          <span style={{ textAlign: "start", lineHeight: 1.2 }}>
+            <span style={{ display: "block", fontWeight: 800, fontSize: "16px", color: "var(--navy-900)" }}>{t.header.brandName}</span>
+            <span style={{ display: "block", fontSize: "11.5px", color: "var(--gold-700)", fontWeight: 700 }}>{t.header.brandTag}</span>
           </span>
         </Link>
 
         <nav style={{ display: "flex", gap: "4px", marginInlineStart: "auto" }} className="desk-nav">
-          {LINKS.map((l) => (
+          {NAV.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -65,18 +96,19 @@ export function Header() {
                 transition: "all .2s",
               }}
             >
-              {l.label}
+              {t.header.nav[l.key]}
             </Link>
           ))}
         </nav>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }} className="desk-cta">
+          <LangToggle label={otherLabel} onToggle={toggle} />
           {user ? (
             <>
-              <Btn variant="ghost" size="sm" icon="grid" onClick={() => router.push("/dashboard")}>لوحتي</Btn>
+              <Btn variant="ghost" size="sm" icon="grid" onClick={() => router.push("/dashboard")}>{t.header.myDashboard}</Btn>
               <button
                 onClick={() => { void logout().then(() => router.push("/")); }}
-                title="خروج"
+                title={t.header.logout}
                 style={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: "10px", background: "var(--cream-2)", color: "var(--ink-2)" }}
               >
                 <Icon name="logout" size={18} />
@@ -84,8 +116,8 @@ export function Header() {
             </>
           ) : (
             <>
-              <Btn variant="ghost" size="sm" onClick={() => router.push("/login")}>دخول</Btn>
-              <Btn variant="gold" size="sm" onClick={() => router.push("/register")}>أنشئ حسابك</Btn>
+              <Btn variant="ghost" size="sm" onClick={() => router.push("/login")}>{t.header.login}</Btn>
+              <Btn variant="gold" size="sm" onClick={() => router.push("/register")}>{t.header.createAccount}</Btn>
             </>
           )}
         </div>
@@ -93,7 +125,7 @@ export function Header() {
         <button
           className="burger"
           onClick={() => setOpen((o) => !o)}
-          aria-label="القائمة"
+          aria-label={t.header.menu}
           style={{ display: "none", width: 42, height: 42, placeItems: "center", borderRadius: "10px", background: "var(--cream-2)", color: "var(--navy-900)" }}
         >
           <Icon name={open ? "x" : "menu"} size={22} />
@@ -102,23 +134,26 @@ export function Header() {
 
       {open && (
         <div className="mobile-menu" style={{ background: "var(--paper)", borderTop: "1px solid var(--line)", padding: "16px 24px 24px", boxShadow: "var(--shadow)" }}>
-          {LINKS.map((l) => (
+          {NAV.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              style={{ display: "block", width: "100%", textAlign: "right", padding: "13px 8px", borderBottom: "1px solid var(--line-2)", fontSize: "16px", fontWeight: 700, color: isActive(l.href) ? "var(--gold-700)" : "var(--ink)" }}
+              style={{ display: "block", width: "100%", textAlign: "start", padding: "13px 8px", borderBottom: "1px solid var(--line-2)", fontSize: "16px", fontWeight: 700, color: isActive(l.href) ? "var(--gold-700)" : "var(--ink)" }}
             >
-              {l.label}
+              {t.header.nav[l.key]}
             </Link>
           ))}
-          <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+          <div style={{ marginTop: "16px", marginBottom: "12px" }}>
+            <LangToggle label={otherLabel} onToggle={toggle} full />
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
             {user ? (
-              <Btn variant="primary" full onClick={() => { setOpen(false); router.push("/dashboard"); }}>لوحة الطالب</Btn>
+              <Btn variant="primary" full onClick={() => { setOpen(false); router.push("/dashboard"); }}>{t.header.studentDashboard}</Btn>
             ) : (
               <>
-                <Btn variant="outline" full onClick={() => { setOpen(false); router.push("/login"); }}>دخول</Btn>
-                <Btn variant="gold" full onClick={() => { setOpen(false); router.push("/register"); }}>حساب جديد</Btn>
+                <Btn variant="outline" full onClick={() => { setOpen(false); router.push("/login"); }}>{t.header.login}</Btn>
+                <Btn variant="gold" full onClick={() => { setOpen(false); router.push("/register"); }}>{t.header.newAccount}</Btn>
               </>
             )}
           </div>

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { Amiri, Tajawal } from "next/font/google";
+import { Amiri, Inter, Tajawal } from "next/font/google";
 import { AuthProvider } from "@/components/auth-context";
+import { LocaleProvider } from "@/components/locale-context";
+import { dir as dirOf } from "@/lib/i18n/config";
+import { getDict } from "@/lib/i18n/dictionaries";
+import { getServerLocale } from "@/lib/locale";
 import "./globals.css";
 
 const tajawal = Tajawal({
@@ -17,34 +21,43 @@ const amiri = Amiri({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "منصة الأستاذ محمد حجاج التعليمية",
-    template: "%s · منصة الأستاذ محمد حجاج",
-  },
-  description:
-    "منصة تعليمية متخصصة في اللغة العربية والعلوم الشرعية وتعليم القرآن الكريم، بإشراف معلّم أزهري موثوق.",
-  openGraph: {
-    title: "منصة الأستاذ محمد حجاج التعليمية",
-    description:
-      "تأسيس، ومناهج إماراتية ومصرية وأزهرية، وعربية لغير الناطقين بها، وتعليم القرآن الكريم.",
-    locale: "ar_AR",
-    type: "website",
-  },
-};
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
-export default function RootLayout({
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getServerLocale();
+  const m = getDict(locale).meta;
+  return {
+    title: { default: m.rootTitleDefault, template: m.rootTitleTemplate },
+    description: m.rootDescription,
+    openGraph: {
+      title: m.ogTitle,
+      description: m.ogDescription,
+      locale: locale === "ar" ? "ar_AR" : "en_US",
+      type: "website",
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getServerLocale();
   return (
     <html
-      lang="ar"
-      dir="rtl"
+      lang={locale}
+      dir={dirOf(locale)}
       data-scroll-behavior="smooth"
-      className={`${tajawal.variable} ${amiri.variable}`}
+      className={`${tajawal.variable} ${amiri.variable} ${inter.variable} loc-${locale}`}
     >
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <LocaleProvider initialLocale={locale}>
+          <AuthProvider>{children}</AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth-context";
+import { useLocale } from "@/components/locale-context";
 import { Badge, Btn, Icon, Ornament } from "@/components/ui";
 import {
-  arNum,
   type CategoryDetail,
   type LevelWithLessons,
   type Plan,
@@ -28,6 +28,7 @@ export function CategoryClient({
 }) {
   const router = useRouter();
   const { isUnlocked } = useAuth();
+  const { t, num } = useLocale();
   const unlocked = isUnlocked(category.id);
   // مجموعات الساب (الأزهر فيه groups)
   const groups: GroupView[] =
@@ -53,7 +54,7 @@ export function CategoryClient({
       <section style={{ background: "linear-gradient(160deg,var(--navy-800),var(--navy-900))", color: "#fff", padding: "44px 0 52px", position: "relative", overflow: "hidden" }}>
         <Ornament size={220} color="rgba(191,145,64,.08)" style={{ position: "absolute", top: "-60px", insetInlineEnd: "3%" }} />
         <div className="wrap" style={{ position: "relative" }}>
-          <Link href="/courses" style={{ display: "inline-flex", alignItems: "center", gap: "7px", color: "#9fb0bf", fontSize: "14px", fontWeight: 700, marginBottom: "22px" }}><Icon name="chevL" size={16} /> كل الكورسات</Link>
+          <Link href="/courses" style={{ display: "inline-flex", alignItems: "center", gap: "7px", color: "#9fb0bf", fontSize: "14px", fontWeight: 700, marginBottom: "22px" }}><Icon name="chevL" size={16} /> {t.category.allCourses}</Link>
           <div style={{ display: "flex", gap: "22px", alignItems: "flex-start", flexWrap: "wrap" }}>
             <span style={{ width: "78px", height: "78px", borderRadius: "20px", background: "linear-gradient(150deg,var(--gold-400),var(--gold-700))", display: "grid", placeItems: "center", flexShrink: 0 }}>
               <span className="serif" style={{ color: "var(--navy-900)", fontSize: "38px", fontWeight: 700 }}>{category.glyph}</span>
@@ -62,23 +63,23 @@ export function CategoryClient({
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px", flexWrap: "wrap" }}>
                 <h1 style={{ color: "#fff", fontSize: "clamp(26px,3.4vw,38px)" }}>{category.title}</h1>
                 <Badge tone="gold">{category.level}</Badge>
-                {unlocked ? <Badge tone="green"><Icon name="unlock" size={13} /> مُفعّل</Badge> : <Badge style={{ background: "rgba(255,255,255,.12)", color: "#cdd7e0" }}><Icon name="lock" size={13} /> مغلق</Badge>}
+                {unlocked ? <Badge tone="green"><Icon name="unlock" size={13} /> {t.common.unlocked}</Badge> : <Badge style={{ background: "rgba(255,255,255,.12)", color: "#cdd7e0" }}><Icon name="lock" size={13} /> {t.common.locked}</Badge>}
               </div>
               <div style={{ color: "var(--gold-200)", fontSize: "15px", fontWeight: 700, marginBottom: "10px" }}>{category.tagline}</div>
               <p style={{ color: "#c5d2dd", fontSize: "16px", lineHeight: 1.8, maxWidth: "680px" }}>{category.desc}</p>
             </div>
             {!unlocked && (
               <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)", borderRadius: "var(--r)", padding: "20px", minWidth: "230px" }}>
-                <div style={{ fontSize: "13px", color: "#9fb0bf", marginBottom: "4px" }}>افتح هذا المسار كاملاً</div>
+                <div style={{ fontSize: "13px", color: "#9fb0bf", marginBottom: "4px" }}>{t.category.unlockTrackFull}</div>
                 {singlePlan && (
                   <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "14px" }}>
-                    <span style={{ fontSize: "30px", fontWeight: 900, color: "#fff", lineHeight: 1 }}>{arNum(singlePlan.prices.AED)}</span>
-                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--gold-400)" }}>د.إ</span>
-                    <span style={{ fontSize: "12.5px", color: "#9fb0bf" }}>· دفعة واحدة</span>
+                    <span style={{ fontSize: "30px", fontWeight: 900, color: "#fff", lineHeight: 1 }}>{num(singlePlan.prices.AED)}</span>
+                    <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--gold-400)" }}>{t.common.currencies.AED.symbol}</span>
+                    <span style={{ fontSize: "12.5px", color: "#9fb0bf" }}>· {t.category.onePayment}</span>
                   </div>
                 )}
-                <Btn variant="gold" full icon="unlock" onClick={goCheckout}>اشترِ المسار</Btn>
-                <div style={{ fontSize: "12px", color: "#9fb0bf", marginTop: "10px", textAlign: "center" }}>الدرس الأول من كل وحدة مجاني</div>
+                <Btn variant="gold" full icon="unlock" onClick={goCheckout}>{t.category.buyTrack}</Btn>
+                <div style={{ fontSize: "12px", color: "#9fb0bf", marginTop: "10px", textAlign: "center" }}>{t.category.firstLessonFree}</div>
               </div>
             )}
           </div>
@@ -99,14 +100,14 @@ export function CategoryClient({
           {/* بحث داخلي */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "var(--paper)", border: "1px solid var(--line)", borderRadius: "999px", padding: "11px 20px", maxWidth: "380px", marginBottom: "24px" }}>
             <Icon name="search" size={18} style={{ color: "var(--muted)" }} />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ابحث داخل المسار…" style={{ border: "none", background: "transparent", outline: "none", flexGrow: 1, fontSize: "14.5px" }} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.category.searchInTrack} style={{ border: "none", background: "transparent", outline: "none", flexGrow: 1, fontSize: "14.5px" }} />
           </div>
 
           {/* أكورديون الساب-كاتيجوريز */}
           {subs.length === 0 ? (
             <div style={{ textAlign: "center", padding: "80px 0", color: "var(--muted)" }}>
               <Icon name={q ? "search" : "book"} size={48} style={{ opacity: 0.4, margin: "0 auto 16px" }} />
-              <p style={{ fontSize: "18px" }}>{q ? "لا توجد نتائج مطابقة لبحثك." : "لا توجد دروس متاحة في هذا المسار حالياً."}</p>
+              <p style={{ fontSize: "18px" }}>{q ? t.category.noSearchResults : t.category.noLessons}</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -116,14 +117,14 @@ export function CategoryClient({
                 const totalMin = sub.totalMinutes;
                 return (
                   <div key={sub.key} style={{ background: "var(--paper)", borderRadius: "var(--r)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: isOpen ? "var(--shadow)" : "var(--shadow-sm)", transition: "box-shadow .25s" }}>
-                    <button onClick={() => setOpenSub(isOpen ? null : sub.key)} style={{ width: "100%", display: "flex", alignItems: "center", gap: "16px", padding: "20px 24px", textAlign: "right" }}>
+                    <button onClick={() => setOpenSub(isOpen ? null : sub.key)} style={{ width: "100%", display: "flex", alignItems: "center", gap: "16px", padding: "20px 24px", textAlign: "start" }}>
                       <span style={{ width: 46, height: 46, borderRadius: "13px", background: isOpen ? "var(--navy-800)" : "var(--cream-2)", color: isOpen ? "var(--gold-400)" : "var(--navy-700)", display: "grid", placeItems: "center", transition: "all .2s", flexShrink: 0 }}><Icon name="book" size={21} /></span>
                       <div style={{ flexGrow: 1 }}>
                         <div style={{ fontSize: "17px", fontWeight: 800, color: "var(--navy-900)" }}>{sub.title}</div>
                         <div style={{ fontSize: "13.5px", color: "var(--muted)", marginTop: "2px", display: "flex", gap: "14px", flexWrap: "wrap" }}>
                           {sub.note && <span style={{ color: "var(--gold-700)", fontWeight: 700 }}>{sub.note}</span>}
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}><Icon name="play" size={12} /> {arNum(lessons.length)} درس</span>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}><Icon name="clock" size={13} /> {arNum(totalMin)} دقيقة</span>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}><Icon name="play" size={12} /> {num(lessons.length)} {t.category.lessonUnit}</span>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}><Icon name="clock" size={13} /> {num(totalMin)} {t.category.minuteUnit}</span>
                         </div>
                       </div>
                       {!unlocked && <Icon name="lock" size={17} style={{ color: "var(--muted)" }} />}
@@ -159,12 +160,13 @@ function LessonRow({
   onOpen: (lesson: PublicLesson, canWatch: boolean) => void;
 }) {
   const { isDone } = useAuth();
+  const { t, num } = useLocale();
   const canWatch = unlocked || lesson.free;
   const done = isDone(lesson.id);
   return (
     <button
       onClick={() => onOpen(lesson, canWatch)}
-      style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "13px 16px", borderRadius: "12px", textAlign: "right", transition: "background .18s" }}
+      style={{ width: "100%", display: "flex", alignItems: "center", gap: "14px", padding: "13px 16px", borderRadius: "12px", textAlign: "start", transition: "background .18s" }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--cream)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
     >
@@ -174,11 +176,11 @@ function LessonRow({
         <Icon name={done ? "check" : canWatch ? "play" : "lock"} size={done ? 18 : 16} stroke={done ? 2.6 : 1.8} />
       </span>
       <div style={{ flexGrow: 1 }}>
-        <div style={{ fontSize: "15px", fontWeight: 700, color: canWatch ? "var(--ink)" : "var(--muted)" }}>الدرس {arNum(idx)}: {lesson.title}</div>
-        <div style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "1px" }}>{arNum(lesson.durationMinutes)} دقيقة</div>
+        <div style={{ fontSize: "15px", fontWeight: 700, color: canWatch ? "var(--ink)" : "var(--muted)" }}>{t.category.lessonLabel} {num(idx)}: {lesson.title}</div>
+        <div style={{ fontSize: "12.5px", color: "var(--muted)", marginTop: "1px" }}>{num(lesson.durationMinutes)} {t.category.minuteUnit}</div>
       </div>
-      {lesson.free && !unlocked && <Badge tone="green">معاينة مجانية</Badge>}
-      {canWatch && <span style={{ color: "var(--navy-600)", fontSize: "13px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>مشاهدة <Icon name="chevL" size={14} /></span>}
+      {lesson.free && !unlocked && <Badge tone="green">{t.category.freePreview}</Badge>}
+      {canWatch && <span style={{ color: "var(--navy-600)", fontSize: "13px", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>{t.category.watch} <Icon name="chevL" size={14} /></span>}
     </button>
   );
 }

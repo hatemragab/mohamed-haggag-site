@@ -5,6 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { MK } from '../../i18n/messages';
 import { JwtUser } from '../decorators/current-user.decorator';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { UserRole } from '../../users/user.schema';
@@ -21,7 +22,7 @@ export class RolesGuard implements CanActivate {
     if (!roles || roles.length === 0) return true;
     const { user } = context.switchToHttp().getRequest<{ user?: JwtUser }>();
     if (!user || !roles.includes(user.role))
-      throw new ForbiddenException('غير مصرّح لك بهذا الإجراء');
+      throw new ForbiddenException(MK.forbidden);
     return true;
   }
 }

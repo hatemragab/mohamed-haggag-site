@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { AdminModule } from './admin/admin.module';
@@ -11,6 +11,7 @@ import { RolesGuard } from './common/guards/roles.guard';
 import { validateEnv } from './config/env.validation';
 import { ContactModule } from './contact/contact.module';
 import { HealthController } from './health/health.controller';
+import { I18nExceptionFilter } from './i18n/i18n-exception.filter';
 import { LessonsModule } from './lessons/lessons.module';
 import { MeModule } from './me/me.module';
 import { OrdersModule } from './orders/orders.module';
@@ -47,6 +48,7 @@ import { UsersModule } from './users/users.module';
   ],
   controllers: [HealthController],
   providers: [
+    { provide: APP_FILTER, useClass: I18nExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],

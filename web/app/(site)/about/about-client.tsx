@@ -2,12 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { Badge, Btn, Counter, Icon, Ornament } from "@/components/ui";
+import { useLocale } from "@/components/locale-context";
 import type { SiteContent } from "@/lib/types";
 
 type Instructor = SiteContent["instructor"];
 
 export function AboutClient({ instructor }: { instructor: Instructor }) {
   const router = useRouter();
+  const { t } = useLocale();
   return (
     <div>
       <section style={{ background: "linear-gradient(160deg,#fdfaf4,#f3ecdf)", padding: "64px 0", position: "relative", overflow: "hidden" }}>
@@ -15,18 +17,18 @@ export function AboutClient({ instructor }: { instructor: Instructor }) {
         <div className="wrap about-grid" style={{ display: "grid", gridTemplateColumns: ".85fr 1.15fr", gap: "48px", alignItems: "center", position: "relative" }}>
           <div style={{ position: "relative" }}>
             <div style={{ position: "absolute", inset: "16px -12px -16px 16px", borderRadius: "var(--r-xl)", background: "linear-gradient(150deg,var(--gold-400),var(--gold-700))", transform: "rotate(2.5deg)" }} />
-            <img src="/instructor.png" alt="الأستاذ محمد حجاج" style={{ position: "relative", width: "100%", borderRadius: "var(--r-xl)", border: "5px solid #fff", boxShadow: "var(--shadow-lg)", aspectRatio: "696/900", objectFit: "cover", objectPosition: "center top" }} />
+            <img src="/instructor.png" alt={t.about.instructorAlt} style={{ position: "relative", width: "100%", borderRadius: "var(--r-xl)", border: "5px solid #fff", boxShadow: "var(--shadow-lg)", aspectRatio: "696/900", objectFit: "cover", objectPosition: "center top" }} />
           </div>
           <div>
-            <Badge tone="gold" style={{ marginBottom: "16px" }}>عن الأستاذ</Badge>
+            <Badge tone="gold" style={{ marginBottom: "16px" }}>{t.about.badge}</Badge>
             <h1 style={{ fontSize: "clamp(30px,4vw,46px)", marginBottom: "10px" }}>{instructor.name}</h1>
             <p style={{ color: "var(--gold-700)", fontSize: "17px", fontWeight: 700, marginBottom: "22px" }}>{instructor.title}</p>
             {instructor.bio.map((p, i) => (
               <p key={i} style={{ color: "var(--ink-2)", fontSize: "16.5px", lineHeight: 1.95, marginBottom: "16px" }}>{p}</p>
             ))}
             <div style={{ display: "flex", gap: "14px", marginTop: "26px", flexWrap: "wrap" }}>
-              <Btn variant="gold" iconAfter="arrow" onClick={() => router.push("/courses")}>استعرض كورساته</Btn>
-              <Btn variant="outline" icon="mail" onClick={() => router.push("/contact")}>تواصل معه</Btn>
+              <Btn variant="gold" iconAfter="arrow" onClick={() => router.push("/courses")}>{t.about.browseCourses}</Btn>
+              <Btn variant="outline" icon="mail" onClick={() => router.push("/contact")}>{t.about.contactHim}</Btn>
             </div>
           </div>
         </div>
@@ -37,7 +39,7 @@ export function AboutClient({ instructor }: { instructor: Instructor }) {
         <div className="wrap">
           <div className="about-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px" }}>
             <div>
-              <h2 style={{ fontSize: "28px", marginBottom: "24px" }}>المؤهّلات والخبرة</h2>
+              <h2 style={{ fontSize: "28px", marginBottom: "24px" }}>{t.about.credentialsTitle}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 {instructor.credentials.map((c, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "14px", background: "var(--paper)", borderRadius: "var(--r)", padding: "18px 20px", border: "1px solid var(--line)", boxShadow: "var(--shadow-sm)" }}>
@@ -48,7 +50,7 @@ export function AboutClient({ instructor }: { instructor: Instructor }) {
               </div>
             </div>
             <div>
-              <h2 style={{ fontSize: "28px", marginBottom: "24px" }}>بالأرقام</h2>
+              <h2 style={{ fontSize: "28px", marginBottom: "24px" }}>{t.about.statsTitle}</h2>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 {instructor.stats.map((s, i) => (
                   <div key={i} style={{ background: "linear-gradient(160deg,var(--navy-700),var(--navy-900))", borderRadius: "var(--r-lg)", padding: "26px", color: "#fff", textAlign: "center" }}>

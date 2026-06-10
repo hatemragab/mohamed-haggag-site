@@ -34,6 +34,12 @@
   --serif: var(--font-amiri), serif;
 }
 
+/* English uses a Latin-optimized sans; --serif stays Amiri so Arabic accents
+   (the brand glyph, the Quran ayah) keep rendering correctly even in EN. */
+html.loc-en {
+  --font: var(--font-inter), system-ui, sans-serif;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

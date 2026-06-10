@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { serverApi } from "@/lib/api";
+import { getDict } from "@/lib/i18n/dictionaries";
+import { getServerLocale } from "@/lib/locale";
 import type { CategoryDetail, Plan } from "@/lib/types";
 import { CategoryClient } from "./category-client";
 
@@ -20,7 +22,8 @@ export async function generateMetadata({
     const category = await getCategory(slug);
     return { title: category.title };
   } catch {
-    return { title: "الكورسات" };
+    const t = getDict(await getServerLocale());
+    return { title: t.category.metaTitle };
   }
 }
 

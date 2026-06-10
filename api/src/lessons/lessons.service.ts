@@ -9,6 +9,7 @@ import { Model, Types } from 'mongoose';
 import { Category, CategoryDocument } from '../categories/category.schema';
 import { JwtUser } from '../common/decorators/current-user.decorator';
 import { extractYoutubeId } from '../common/utils/youtube';
+import { MK } from '../i18n/messages';
 import { UsersService } from '../users/users.service';
 import {
   CreateLessonDto,
@@ -56,7 +57,7 @@ export class LessonsService {
 
   async findById(id: string): Promise<LessonDocument> {
     const lesson = await this.lessons.findById(id).exec();
-    if (!lesson) throw new NotFoundException('الدرس غير موجود');
+    if (!lesson) throw new NotFoundException(MK.lessonNotFound);
     return lesson;
   }
 
@@ -67,7 +68,7 @@ export class LessonsService {
   async context(id: string) {
     const lesson = await this.findById(id);
     const cat = await this.categories.findById(lesson.category).exec();
-    if (!cat) throw new NotFoundException('القسم غير موجود');
+    if (!cat) throw new NotFoundException(MK.categoryNotFound);
     const siblings = await this.lessons
       .find({
         category: lesson.category,
@@ -115,26 +116,20 @@ export class LessonsService {
   async watch(id: string, user?: JwtUser) {
     const lesson = await this.findById(id);
     if (lesson.free) return { youtubeId: lesson.youtubeId };
-    if (!user)
-      throw new ForbiddenException(
-        'سجّل الدخول وافتح المسار لمشاهدة هذا الدرس',
-      );
+    if (!user) throw new ForbiddenException(MK.lessonLoginRequired);
     const doc = await this.users.findById(user.sub);
     if (doc.status === 'suspended')
-      throw new ForbiddenException('هذا الحساب موقوف — تواصل مع الإدارة');
+      throw new ForbiddenException(MK.accountSuspended);
     if (!this.users.isUnlocked(doc, lesson.category.toString()))
-      throw new ForbiddenException('هذا الدرس مغلق — افتح المسار لمشاهدته');
+      throw new ForbiddenException(MK.lessonLocked);
     return { youtubeId: lesson.youtubeId };
   }
 
   async create(dto: CreateLessonDto) {
     const youtubeId = extractYoutubeId(dto.youtube);
-    if (!youtubeId)
-      throw new BadRequestException(
-        'لم يتم التعرّف على مُعرّف يوتيوب صحيح — تأكد من الرابط',
-      );
+    if (!youtubeId) throw new BadRequestException(MK.invalidYoutubeId);
     const cat = await this.categories.findById(dto.categoryId).exec();
-    if (!cat) throw new NotFoundException('القسم غير موجود');
+    if (!cat) throw new NotFoundException(MK.categoryNotFound);
     const groupKey = dto.groupKey ?? null;
     const last = await this.lessons
       .findOne({ category: cat._id, groupKey, levelKey: dto.levelKey })
@@ -158,10 +153,7 @@ export class LessonsService {
     const lesson = await this.findById(id);
     if (dto.youtube !== undefined) {
       const youtubeId = extractYoutubeId(dto.youtube);
-      if (!youtubeId)
-        throw new BadRequestException(
-          'لم يتم التعرّف على مُعرّف يوتيوب صحيح — تأكد من الرابط',
-        );
+      if (!youtubeId) throw new BadRequestException(MK.invalidYoutubeId);
       lesson.youtubeId = youtubeId;
     }
     if (dto.title !== undefined) lesson.title = dto.title.trim();
@@ -197,7 +189,7 @@ export class LessonsService {
       dto.orderedIds.length !== list.length ||
       dto.orderedIds.some((id) => !byId.has(id))
     )
-      throw new BadRequestException('قائمة الترتيب غير مطابقة لدروس المستوى');
+      throw new BadRequestException(MK.reorderMismatch);
     await Promise.all(
       dto.orderedIds.map((id, i) =>
         this.lessons.updateOne({ _id: id }, { $set: { order: i + 1 } }).exec(),

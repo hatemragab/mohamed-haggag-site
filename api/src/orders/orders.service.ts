@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CategoriesService } from '../categories/categories.service';
+import { MK } from '../i18n/messages';
 import { PlansService } from '../plans/plans.service';
 import { UsersService } from '../users/users.service';
 import { CreateOrderDto } from './dto/order.dto';
@@ -51,8 +52,7 @@ export class OrdersService {
     const plan = await this.plans.byKey(dto.planKey);
     let categoryId: string | null = null;
     if (dto.planKey === 'single') {
-      if (!dto.categoryId)
-        throw new BadRequestException('اختر المسار المراد شراؤه');
+      if (!dto.categoryId) throw new BadRequestException(MK.selectCategory);
       const cat = await this.categories.findById(dto.categoryId);
       categoryId = cat._id.toString();
     }
@@ -80,12 +80,12 @@ export class OrdersService {
   /** Mock capture: confirm with the provider, mark paid, apply the unlock. */
   async pay(userId: string, orderId: string) {
     const order = await this.orders.findById(orderId).exec();
-    if (!order) throw new NotFoundException('الطلب غير موجود');
+    if (!order) throw new NotFoundException(MK.orderNotFound);
     if (order.user.toString() !== userId)
-      throw new ForbiddenException('هذا الطلب لا يخصّك');
+      throw new ForbiddenException(MK.orderNotYours);
     if (order.status === 'paid') return this.view(order);
     if (order.status !== 'pending')
-      throw new BadRequestException('لا يمكن دفع هذا الطلب');
+      throw new BadRequestException(MK.orderNotPayable);
 
     const { success } = await this.providers[order.provider].confirmPayment(
       order.providerRef,
@@ -93,7 +93,7 @@ export class OrdersService {
     if (!success) {
       order.status = 'failed';
       await order.save();
-      throw new BadRequestException('فشلت عملية الدفع — حاول مجدداً');
+      throw new BadRequestException(MK.paymentFailed);
     }
     order.status = 'paid';
     order.paidAt = new Date();
@@ -133,7 +133,7 @@ export class OrdersService {
 
   async adminRemove(id: string) {
     const res = await this.orders.deleteOne({ _id: id }).exec();
-    if (res.deletedCount === 0) throw new NotFoundException('الطلب غير موجود');
+    if (res.deletedCount === 0) throw new NotFoundException(MK.orderNotFound);
     return { ok: true };
   }
 

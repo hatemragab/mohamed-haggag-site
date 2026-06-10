@@ -5,10 +5,11 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { MK } from '../../i18n/messages';
 
 export class CreateTestimonialDto {
   @IsString()
-  @MinLength(1, { message: 'أدخل الاسم' })
+  @MinLength(1, { message: MK.nameRequired })
   name: string;
 
   @IsOptional()
@@ -16,7 +17,7 @@ export class CreateTestimonialDto {
   role?: string;
 
   @IsString()
-  @MinLength(1, { message: 'أدخل نص التقييم' })
+  @MinLength(1, { message: MK.testimonialTextRequired })
   text: string;
 }
 

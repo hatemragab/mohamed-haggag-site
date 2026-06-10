@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { MK } from '../../i18n/messages';
 import { JwtUser } from '../decorators/current-user.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
@@ -40,12 +41,11 @@ export class JwtAuthGuard implements CanActivate {
           secret: process.env.JWT_ACCESS_SECRET ?? 'dev-access-secret',
         });
       } catch {
-        if (!isPublic)
-          throw new UnauthorizedException('انتهت الجلسة — سجّل الدخول مجدداً');
+        if (!isPublic) throw new UnauthorizedException(MK.sessionExpired);
       }
     }
     if (!req.user && !isPublic)
-      throw new UnauthorizedException('يجب تسجيل الدخول');
+      throw new UnauthorizedException(MK.loginRequired);
     return true;
   }
 }

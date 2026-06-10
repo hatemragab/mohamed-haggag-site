@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { serverApi } from "@/lib/api";
+import { getDict } from "@/lib/i18n/dictionaries";
+import { getServerLocale } from "@/lib/locale";
 import type { LessonContext } from "@/lib/types";
 import { LessonClient } from "./lesson-client";
 
@@ -25,7 +27,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const ctx = await getLessonContext(id);
-  return { title: ctx ? ctx.lesson.title : "الدرس" };
+  const t = getDict(await getServerLocale());
+  return { title: ctx ? ctx.lesson.title : t.lesson.metaTitle };
 }
 
 export default async function LessonPage({

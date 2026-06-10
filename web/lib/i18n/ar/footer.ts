@@ -1,0 +1,22 @@
+export const footer = {
+  brandName: "الأستاذ محمد حجاج",
+  brandTag: "منصة تعليمية أزهرية",
+  colPlatform: "المنصة",
+  colHelp: "المساعدة",
+  colAccount: "الحساب",
+  nav: {
+    home: "الرئيسية",
+    courses: "الكورسات",
+    pricing: "الباقات والأسعار",
+    about: "عن الأستاذ",
+    faq: "الأسئلة الشائعة",
+    contact: "تواصل معنا",
+    terms: "الشروط والخصوصية",
+    register: "إنشاء حساب",
+    login: "تسجيل الدخول",
+    dashboard: "لوحة الطالب",
+  },
+  platformName: "منصة الأستاذ محمد حجاج التعليمية",
+  rights: "جميع الحقوق محفوظة.",
+  adminLogin: "دخول الإدارة",
+};

@@ -1,0 +1,22 @@
+export const footer = {
+  brandName: "Mohamed Haggag",
+  brandTag: "Azhari Learning Platform",
+  colPlatform: "Platform",
+  colHelp: "Help",
+  colAccount: "Account",
+  nav: {
+    home: "Home",
+    courses: "Courses",
+    pricing: "Plans & Pricing",
+    about: "The Instructor",
+    faq: "FAQ",
+    contact: "Contact",
+    terms: "Terms & Privacy",
+    register: "Create account",
+    login: "Sign in",
+    dashboard: "Student Dashboard",
+  },
+  platformName: "Mohamed Haggag Academy",
+  rights: "All rights reserved.",
+  adminLogin: "Admin Login",
+};

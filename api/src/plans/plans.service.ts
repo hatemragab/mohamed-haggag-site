@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { MK } from '../i18n/messages';
 import { UpdatePlanDto } from './dto/plan.dto';
 import { Plan, PlanDocument, PlanKey } from './plan.schema';
 
@@ -16,7 +17,7 @@ export class PlansService {
 
   async byKey(key: PlanKey): Promise<PlanDocument> {
     const plan = await this.plans.findOne({ key }).exec();
-    if (!plan) throw new NotFoundException('الباقة غير موجودة');
+    if (!plan) throw new NotFoundException(MK.planNotFound);
     return plan;
   }
 

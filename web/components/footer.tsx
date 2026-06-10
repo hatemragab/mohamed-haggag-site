@@ -1,39 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale } from "./locale-context";
 import { Icon } from "./ui";
 
 const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3001";
 
 const COLS = [
   {
-    title: "المنصة",
+    titleKey: "colPlatform",
     links: [
-      ["/", "الرئيسية"],
-      ["/courses", "الكورسات"],
-      ["/pricing", "الباقات والأسعار"],
-      ["/about", "عن الأستاذ"],
+      ["/", "home"],
+      ["/courses", "courses"],
+      ["/pricing", "pricing"],
+      ["/about", "about"],
     ],
   },
   {
-    title: "المساعدة",
+    titleKey: "colHelp",
     links: [
-      ["/faq", "الأسئلة الشائعة"],
-      ["/contact", "تواصل معنا"],
-      ["/terms", "الشروط والخصوصية"],
+      ["/faq", "faq"],
+      ["/contact", "contact"],
+      ["/terms", "terms"],
     ],
   },
   {
-    title: "الحساب",
+    titleKey: "colAccount",
     links: [
-      ["/register", "إنشاء حساب"],
-      ["/login", "تسجيل الدخول"],
-      ["/dashboard", "لوحة الطالب"],
+      ["/register", "register"],
+      ["/login", "login"],
+      ["/dashboard", "dashboard"],
     ],
   },
 ] as const;
 
 export function Footer({ footerText }: { footerText: string }) {
+  const { t } = useLocale();
+  const f = t.footer;
   return (
     <footer style={{ background: "var(--navy-900)", color: "#cdd7e0", paddingTop: "72px" }}>
       <div
@@ -46,16 +49,16 @@ export function Footer({ footerText }: { footerText: string }) {
               <span className="serif" style={{ color: "var(--navy-900)", fontSize: "25px", fontWeight: 700 }}>م</span>
             </span>
             <div>
-              <div style={{ fontWeight: 800, fontSize: "17px", color: "#fff" }}>الأستاذ محمد حجاج</div>
-              <div style={{ fontSize: "12px", color: "var(--gold-400)" }}>منصة تعليمية أزهرية</div>
+              <div style={{ fontWeight: 800, fontSize: "17px", color: "#fff" }}>{f.brandName}</div>
+              <div style={{ fontSize: "12px", color: "var(--gold-400)" }}>{f.brandTag}</div>
             </div>
           </div>
           <p style={{ fontSize: "14.5px", lineHeight: 1.9, maxWidth: "320px", color: "#9fb0bf" }}>{footerText}</p>
         </div>
         {COLS.map((c) => (
-          <div key={c.title}>
-            <div style={{ fontWeight: 800, color: "#fff", marginBottom: "16px", fontSize: "15px" }}>{c.title}</div>
-            {c.links.map(([href, label]) => (
+          <div key={c.titleKey}>
+            <div style={{ fontWeight: 800, color: "#fff", marginBottom: "16px", fontSize: "15px" }}>{f[c.titleKey]}</div>
+            {c.links.map(([href, key]) => (
               <Link
                 key={href}
                 href={href}
@@ -63,7 +66,7 @@ export function Footer({ footerText }: { footerText: string }) {
                 onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold-400)")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#9fb0bf")}
               >
-                {label}
+                {f.nav[key]}
               </Link>
             ))}
           </div>
@@ -74,7 +77,7 @@ export function Footer({ footerText }: { footerText: string }) {
           className="wrap"
           style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", padding: "22px 24px", fontSize: "13.5px", color: "#7f909f" }}
         >
-          <span>© {new Date().getFullYear()} منصة الأستاذ محمد حجاج التعليمية — جميع الحقوق محفوظة.</span>
+          <span>© {new Date().getFullYear()} {f.platformName} — {f.rights}</span>
           <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
             <a
               href={ADMIN_URL}
@@ -82,7 +85,7 @@ export function Footer({ footerText }: { footerText: string }) {
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold-400)")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#7f909f")}
             >
-              <Icon name="shield" size={15} /> دخول الإدارة
+              <Icon name="shield" size={15} /> {f.adminLogin}
             </a>
             <span className="serif" style={{ color: "var(--gold-400)", fontSize: "17px" }}>﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾</span>
           </div>

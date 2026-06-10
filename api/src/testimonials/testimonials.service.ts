@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { MK } from '../i18n/messages';
 import {
   CreateTestimonialDto,
   ReorderTestimonialsDto,
@@ -39,7 +40,7 @@ export class TestimonialsService {
 
   async update(id: string, dto: UpdateTestimonialDto) {
     const t = await this.testimonials.findById(id).exec();
-    if (!t) throw new NotFoundException('التقييم غير موجود');
+    if (!t) throw new NotFoundException(MK.testimonialNotFound);
     Object.assign(t, dto);
     await t.save();
     return this.list();
@@ -48,7 +49,7 @@ export class TestimonialsService {
   async remove(id: string) {
     const res = await this.testimonials.deleteOne({ _id: id }).exec();
     if (res.deletedCount === 0)
-      throw new NotFoundException('التقييم غير موجود');
+      throw new NotFoundException(MK.testimonialNotFound);
     await this.normalize();
     return this.list();
   }

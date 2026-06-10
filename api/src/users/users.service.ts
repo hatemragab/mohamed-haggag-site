@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { MK } from '../i18n/messages';
 import { PlanKey } from '../plans/plan.schema';
 import { User, UserDocument } from './user.schema';
 
@@ -23,7 +24,7 @@ export class UsersService {
 
   async findById(id: string): Promise<UserDocument> {
     const user = await this.model.findById(id).exec();
-    if (!user) throw new NotFoundException('المستخدم غير موجود');
+    if (!user) throw new NotFoundException(MK.userNotFound);
     return user;
   }
 

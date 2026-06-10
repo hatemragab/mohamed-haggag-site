@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth-context";
+import { useLocale } from "@/components/locale-context";
 import { Badge, Btn, Icon, Ornament } from "@/components/ui";
 import { ApiError, apiGet } from "@/lib/client";
-import { arNum, type LessonContext, type PublicLesson } from "@/lib/types";
+import type { LessonContext, PublicLesson } from "@/lib/types";
 
 /* صفحة الدرس / مشغّل الفيديو — منقولة من النموذج الأولي (LessonPage) */
 export function LessonClient({ ctx }: { ctx: LessonContext }) {
   const { lesson, category, level, siblings } = ctx;
   const router = useRouter();
+  const { t, num } = useLocale();
   const {
     user,
     loading: authLoading,
@@ -56,7 +58,7 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
       if (e instanceof ApiError)
         setPlayError({ status: e.status, message: e.message });
       else
-        setPlayError({ status: 0, message: "تعذّر تشغيل الفيديو، حاول مرة أخرى." });
+        setPlayError({ status: 0, message: t.lesson.videoLoadError });
     } finally {
       setStarting(false);
     }
@@ -93,7 +95,7 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
               <Ornament size={200} color="rgba(191,145,64,.07)" style={{ position: "absolute", top: "-40px", insetInlineStart: "-40px" }} />
               {youtubeId ? (
                 <iframe
-                  title={`الدرس ${lesson.order}: ${lesson.title}`}
+                  title={`${t.lesson.lessonLabel} ${num(lesson.order)}: ${lesson.title}`}
                   src={`https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&autoplay=1&playsinline=1&color=white`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -108,10 +110,10 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                   <span style={{ width: "84px", height: "84px", borderRadius: "50%", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.14)", color: "var(--gold-400)", display: "grid", placeItems: "center", margin: "0 auto 18px" }}>
                     <Icon name="lock" size={34} />
                   </span>
-                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>هذا الدرس مغلق</div>
-                  <div style={{ color: "#9fb0bf", fontSize: "13px", marginTop: "4px" }}>درس مصوّر · {arNum(lesson.durationMinutes)} دقيقة</div>
+                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>{t.lesson.lockedTitle}</div>
+                  <div style={{ color: "#9fb0bf", fontSize: "13px", marginTop: "4px" }}>{t.lesson.videoLesson} · {num(lesson.durationMinutes)} {t.lesson.minutes}</div>
                   <div style={{ marginTop: "18px", display: "flex", justifyContent: "center" }}>
-                    <Btn variant="gold" icon="unlock" onClick={() => router.push(checkoutHref)}>افتح المسار</Btn>
+                    <Btn variant="gold" icon="unlock" onClick={() => router.push(checkoutHref)}>{t.lesson.unlockTrack}</Btn>
                   </div>
                 </div>
               ) : playError ? (
@@ -123,11 +125,11 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                   <div style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>{playError.message}</div>
                   <div style={{ marginTop: "16px", display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap" }}>
                     {playError.status === 401 ? (
-                      <Btn variant="gold" icon="user" onClick={() => router.push("/login")}>تسجيل الدخول</Btn>
+                      <Btn variant="gold" icon="user" onClick={() => router.push("/login")}>{t.lesson.signIn}</Btn>
                     ) : playError.status === 403 ? (
-                      <Btn variant="gold" icon="unlock" onClick={() => router.push(checkoutHref)}>افتح المسار</Btn>
+                      <Btn variant="gold" icon="unlock" onClick={() => router.push(checkoutHref)}>{t.lesson.unlockTrack}</Btn>
                     ) : (
-                      <Btn variant="gold" icon="play" onClick={() => void play()}>إعادة المحاولة</Btn>
+                      <Btn variant="gold" icon="play" onClick={() => void play()}>{t.common.retry}</Btn>
                     )}
                   </div>
                 </div>
@@ -137,7 +139,7 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                   <button
                     onClick={() => void play()}
                     disabled={starting}
-                    aria-label="اضغط للتشغيل"
+                    aria-label={t.lesson.pressToPlay}
                     onMouseEnter={() => setPlayHover(true)}
                     onMouseLeave={() => setPlayHover(false)}
                     style={{ width: "84px", height: "84px", borderRadius: "50%", background: "var(--gold)", color: "var(--navy-900)", display: "grid", placeItems: "center", margin: "0 auto 18px", boxShadow: "0 8px 30px rgba(191,145,64,.5)", transition: "transform .2s", transform: playHover && !starting ? "scale(1.08)" : "scale(1)" }}
@@ -148,10 +150,10 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                       <Icon name="play" size={34} />
                     )}
                   </button>
-                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>اضغط للتشغيل</div>
-                  <div style={{ color: "#9fb0bf", fontSize: "13px", marginTop: "4px" }}>درس مصوّر · {arNum(lesson.durationMinutes)} دقيقة</div>
+                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "16px" }}>{t.lesson.pressToPlay}</div>
+                  <div style={{ color: "#9fb0bf", fontSize: "13px", marginTop: "4px" }}>{t.lesson.videoLesson} · {num(lesson.durationMinutes)} {t.lesson.minutes}</div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginTop: "14px", background: "rgba(255,255,255,.08)", border: "1px solid rgba(255,255,255,.14)", padding: "6px 14px", borderRadius: "999px", color: "#cdd7e0", fontSize: "12px", fontWeight: 700 }}>
-                    <Icon name="shield" size={13} /> فيديو محمي
+                    <Icon name="shield" size={13} /> {t.lesson.protectedVideo}
                   </div>
                 </div>
               )}
@@ -162,28 +164,28 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "12px" }}>
                 <Badge tone="navy">{category.title}</Badge>
                 <Badge tone="gold">{level.title}</Badge>
-                {lesson.free && <Badge tone="green">معاينة مجانية</Badge>}
+                {lesson.free && <Badge tone="green">{t.lesson.freePreview}</Badge>}
               </div>
-              <h1 style={{ fontSize: "clamp(24px,3vw,32px)", marginBottom: "12px" }}>الدرس {arNum(lesson.order)}: {lesson.title}</h1>
+              <h1 style={{ fontSize: "clamp(24px,3vw,32px)", marginBottom: "12px" }}>{t.lesson.lessonLabel} {num(lesson.order)}: {lesson.title}</h1>
               <div style={{ display: "flex", gap: "20px", color: "var(--muted)", fontSize: "14.5px", fontWeight: 600, marginBottom: "20px", flexWrap: "wrap" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="clock" size={16} /> {arNum(lesson.durationMinutes)} دقيقة</span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="user" size={16} /> الأستاذ محمد حجاج</span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="layers" size={16} /> الدرس {arNum(lesson.order)} من {arNum(lessons.length)}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="clock" size={16} /> {num(lesson.durationMinutes)} {t.lesson.minutes}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="user" size={16} /> {t.lesson.instructor}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}><Icon name="layers" size={16} /> {t.lesson.lessonXofY.replace("{x}", num(lesson.order)).replace("{y}", num(lessons.length))}</span>
               </div>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", padding: "20px", background: "var(--paper)", borderRadius: "var(--r)", border: "1px solid var(--line)" }}>
                 {user ? (
-                  <Btn variant={done ? "soft" : "primary"} icon="check" disabled={marking} onClick={() => void mark()}>{done ? "تم الإكمال ✓" : "تحديد كمكتمل"}</Btn>
+                  <Btn variant={done ? "soft" : "primary"} icon="check" disabled={marking} onClick={() => void mark()}>{done ? t.lesson.markedDone : t.lesson.markAsDone}</Btn>
                 ) : (
                   <span style={{ display: "inline-flex", flexDirection: "column", gap: "4px" }}>
-                    <Btn variant="primary" icon="check" disabled>تحديد كمكتمل</Btn>
-                    <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 600, textAlign: "center" }}>سجّل الدخول لحفظ تقدّمك</span>
+                    <Btn variant="primary" icon="check" disabled>{t.lesson.markAsDone}</Btn>
+                    <span style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 600, textAlign: "center" }}>{t.lesson.signInToSaveProgress}</span>
                   </span>
                 )}
-                {prev && <Btn variant="ghost" icon="chevR" onClick={() => router.push(`/lessons/${prev.id}`)}>الدرس السابق</Btn>}
+                {prev && <Btn variant="ghost" icon="chevR" onClick={() => router.push(`/lessons/${prev.id}`)}>{t.lesson.previousLesson}</Btn>}
                 {next ? (
-                  <Btn variant="outline" iconAfter="chevL" onClick={() => goLesson(next)} style={{ marginInlineStart: "auto" }}>الدرس التالي</Btn>
+                  <Btn variant="outline" iconAfter="chevL" onClick={() => goLesson(next)} style={{ marginInlineStart: "auto" }}>{t.lesson.nextLesson}</Btn>
                 ) : (
-                  <Badge tone="green" style={{ marginInlineStart: "auto", padding: "10px 16px" }}><Icon name="cap" size={15} /> نهاية الوحدة</Badge>
+                  <Badge tone="green" style={{ marginInlineStart: "auto", padding: "10px 16px" }}><Icon name="cap" size={15} /> {t.lesson.endOfUnit}</Badge>
                 )}
               </div>
             </div>
@@ -192,7 +194,7 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
           {/* قائمة دروس الوحدة */}
           <aside style={{ position: "sticky", top: "92px", background: "var(--paper)", borderRadius: "var(--r-lg)", border: "1px solid var(--line)", overflow: "hidden", boxShadow: "var(--shadow-sm)" }}>
             <div style={{ padding: "18px 20px", borderBottom: "1px solid var(--line-2)", background: "var(--cream)" }}>
-              <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--navy-900)" }}>دروس الوحدة</div>
+              <div style={{ fontWeight: 800, fontSize: "16px", color: "var(--navy-900)" }}>{t.lesson.unitLessons}</div>
               <div style={{ fontSize: "13px", color: "var(--muted)", marginTop: "2px" }}>{level.title}</div>
             </div>
             <div style={{ maxHeight: "560px", overflowY: "auto", padding: "8px" }}>
@@ -204,14 +206,14 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                   <button
                     key={l.id}
                     onClick={() => goLesson(l)}
-                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px", borderRadius: "11px", textAlign: "right", background: active ? "var(--gold-100)" : "transparent", transition: "background .18s", marginBottom: "2px" }}
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "12px", padding: "12px", borderRadius: "11px", textAlign: "start", background: active ? "var(--gold-100)" : "transparent", transition: "background .18s", marginBottom: "2px" }}
                   >
                     <span style={{ width: 32, height: 32, borderRadius: "9px", flexShrink: 0, display: "grid", placeItems: "center", background: ld ? "var(--green)" : active ? "var(--gold)" : "var(--cream-2)", color: ld ? "#fff" : active ? "#fff" : can ? "var(--navy-700)" : "var(--muted)" }}>
                       <Icon name={ld ? "check" : can ? "play" : "lock"} size={ld ? 15 : 13} stroke={ld ? 2.6 : 1.8} />
                     </span>
                     <div style={{ flexGrow: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: active ? "var(--navy-900)" : can ? "var(--ink)" : "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{arNum(l.order)}. {l.title}</div>
-                      <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>{arNum(l.durationMinutes)} دقيقة</div>
+                      <div style={{ fontSize: "13.5px", fontWeight: 700, color: active ? "var(--navy-900)" : can ? "var(--ink)" : "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{num(l.order)}. {l.title}</div>
+                      <div style={{ fontSize: "11.5px", color: "var(--muted)" }}>{num(l.durationMinutes)} {t.lesson.minutes}</div>
                     </div>
                   </button>
                 );

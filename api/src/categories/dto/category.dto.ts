@@ -1,9 +1,10 @@
 import { IsIn, IsOptional, IsString, MinLength } from 'class-validator';
+import { MK } from '../../i18n/messages';
 import { CATEGORY_LEVELS, CategoryLevel } from '../category.schema';
 
 export class CreateCategoryDto {
   @IsString()
-  @MinLength(2, { message: 'أدخل اسم القسم' })
+  @MinLength(2, { message: MK.categoryNameRequired })
   title: string;
 
   @IsOptional()
@@ -51,7 +52,7 @@ export class AddLevelDto {
   groupKey?: string;
 
   @IsString()
-  @MinLength(1, { message: 'أدخل اسم المستوى' })
+  @MinLength(1, { message: MK.levelNameRequired })
   title: string;
 
   @IsOptional()

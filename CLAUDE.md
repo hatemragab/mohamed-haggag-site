@@ -36,7 +36,7 @@ Lessons are unlisted YouTube videos; the platform stores only the validated 11-c
 - **Seed** (`api/src/seed/`): the ONLY place prototype content lives in code. `genLessons()` there replicates the prototype's deterministic generator (5–8 lessons/level, first free). Re-running replaces content collections but never touches student users.
 - **Web app pattern**: thin server `page.tsx` (metadata + `serverApi()` fetch with `cache:'no-store'` so admin edits show on refresh) + one `*-client.tsx` for interactivity. Auth/user state via `components/auth-context.tsx` (`useAuth()`), browser fetches via `lib/client.ts` (credentials + silent one-shot refresh on 401). Styling = prototype's inline-style objects + CSS custom properties in `app/globals.css` (do NOT convert to Tailwind classes — fidelity to the prototype is intentional).
 - **Admin app**: fully client-side pages under `app/(panel)/<tab>/` (server `page.tsx` only for metadata) behind the client guard in `(panel)/layout.tsx`; the API is the real enforcement. Shared dark-theme widgets in `components/admin-ui.tsx` (AInput/AArea/ASelect/AToggle/ABtn/AModal/ACard — AModal closes on Esc). Last active tab is remembered via localStorage (`components/shell.tsx`).
-- **Numbers/dates**: always Eastern-Arabic digits via `arNum()`/`arDate()` from each app's `lib/types.ts` (matches the prototype's `toLocaleString('ar-EG')`).
+- **Numbers/dates**: admin uses Eastern-Arabic digits via `arNum()`/`arDate()` from `lib/types.ts`. The public web is locale-aware — use `useLocale().num(n)` (client) / `fmtNum(n, locale)` (server) instead of `arNum` so English renders Western digits (see Internationalization).
 
 ## Next.js 16 gotchas (both fronts)
 
@@ -44,7 +44,16 @@ Lessons are unlisted YouTube videos; the platform stores only the validated 11-c
 
 ## Language & design
 
-Everything user-facing is Arabic, RTL (`lang="ar" dir="rtl"`), CSS logical properties. Fonts: Tajawal (UI) + Amiri (serif accents) via `next/font`. Tokens: navy `#0a1f36→#2d6189`, gold `#9c7322→#f4ead2`, creams `#faf6ee/#f3ecdf`, ink `#16202b/#41505f`, green `#3f7d5e`, danger `#b4452f`, radii 10/16/24/32, pill buttons, soft layered shadows. Keep Arabic copy byte-identical to the prototype unless fixing an actual error.
+Arabic is the default, RTL, CSS logical properties. Fonts: Tajawal (UI) + Amiri (serif accents) via `next/font` (+ Inter for Latin/English). Tokens: navy `#0a1f36→#2d6189`, gold `#9c7322→#f4ead2`, creams `#faf6ee/#f3ecdf`, ink `#16202b/#41505f`, green `#3f7d5e`, danger `#b4452f`, radii 10/16/24/32, pill buttons, soft layered shadows. Keep Arabic copy byte-identical to the prototype unless fixing an actual error. The **public web is bilingual** (see Internationalization); the **admin panel is Arabic-only**.
+
+## Internationalization (web: AR default + EN)
+
+The public web supports English alongside Arabic. **Scope: UI chrome + API messages only — DB content stays Arabic** (lessons are Arabic-teaching content; categories/lessons/hero/FAQ/plans/testimonials are not translated). See `DECISIONS.md` #33–36.
+
+- **Locale source**: the `mh_locale` cookie (`ar`|`en`, default `ar`). Read server-side via `getServerLocale()` (`lib/locale.ts` → `cookies()`), client-side via `useLocale()` (`components/locale-context.tsx`). No `[locale]` route segment.
+- **Switching**: the header AR/EN toggle calls `useLocale().toggle()` → writes the cookie, flips `<html lang/dir/class="loc-*">` imperatively, and `router.refresh()`. The root `layout.tsx` sets `lang`/`dir`/font and localized metadata from the cookie on every request.
+- **Dictionaries** live in `web/lib/i18n/{ar,en}/<namespace>.ts`, composed in `index.ts`. `Dict = typeof ar`; English is enforced to match via `satisfies Record<Locale, Dict>` (a missing/renamed EN key fails `tsc`). Components read `const { t, num } = useLocale()` and reference `t.<ns>.<key>`; **never translate values coming from props/API** (those are content and stay Arabic). Numbers: `useLocale().num(n)` (client) or `fmtNum(n, locale)` (server) — Eastern-Arabic digits for `ar`, Western for `en`.
+- **API**: messages are keys (`MK.*`) in `api/src/i18n/messages.ts` (`{ar,en}`); a global `I18nExceptionFilter` localizes them per request (`?lang` → `Accept-Language` → cookie → default `ar`). The browser client (`lib/client.ts`) forwards the locale as `Accept-Language` (the web cookie can't reach the cross-origin API). Throw new user-facing errors with a `MK.*` key, not a literal.
 
 ## Running the Prototype (reference only)
 

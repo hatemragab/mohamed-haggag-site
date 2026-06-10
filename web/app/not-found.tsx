@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getDict } from "@/lib/i18n/dictionaries";
+import { getServerLocale } from "@/lib/locale";
 
-export const metadata: Metadata = { title: "الصفحة غير موجودة" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDict(await getServerLocale());
+  return { title: t.errors.notFoundMetaTitle };
+}
 
 /** صفحة ٤٠٤ الجذرية — مستقلة عن تخطيط (site)، بأنماط مضمّنة من متغيرات globals.css. */
-export default function NotFound() {
+export default async function NotFound() {
+  const t = getDict(await getServerLocale());
   return (
     <main
       style={{
@@ -46,10 +52,10 @@ export default function NotFound() {
             lineHeight: 1.4,
           }}
         >
-          هذه الصفحة غير موجودة
+          {t.errors.notFoundTitle}
         </h1>
         <p style={{ color: "var(--ink-2)", fontSize: "16px", marginBottom: "28px" }}>
-          ربما تغيّر عنوان الصفحة أو حُذفت. يمكنك العودة إلى الصفحة الرئيسية ومتابعة التصفح.
+          {t.errors.notFoundDescription}
         </p>
         <Link
           href="/"
@@ -64,7 +70,7 @@ export default function NotFound() {
             boxShadow: "var(--shadow-sm)",
           }}
         >
-          العودة للرئيسية
+          {t.errors.backHome}
         </Link>
       </div>
     </main>

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { MK } from '../i18n/messages';
 import { UpdateSiteContentDto } from './dto/site-content.dto';
 import { SiteContent, SiteContentDocument } from './site-content.schema';
 
@@ -13,10 +14,7 @@ export class SiteContentService {
 
   async get(): Promise<SiteContentDocument> {
     const doc = await this.model.findOne({ key: 'main' }).exec();
-    if (!doc)
-      throw new NotFoundException(
-        'محتوى الموقع غير مُهيّأ — شغّل pnpm seed أولاً',
-      );
+    if (!doc) throw new NotFoundException(MK.siteContentMissing);
     return doc;
   }
 

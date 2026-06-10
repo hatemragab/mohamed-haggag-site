@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { JwtUser } from '../common/decorators/current-user.decorator';
+import { MK } from '../i18n/messages';
 import { UserDocument } from '../users/user.schema';
 import { UsersService } from '../users/users.service';
 import { AdminLoginDto, LoginDto, RegisterDto } from './dto/auth.dto';
@@ -74,8 +75,7 @@ export class AuthService {
 
   async register(dto: RegisterDto, res: Response) {
     const existing = await this.users.findByEmail(dto.email);
-    if (existing)
-      throw new ConflictException('هذا البريد الإلكتروني مسجّل بالفعل');
+    if (existing) throw new ConflictException(MK.emailTaken);
     const user = await this.users.create({
       name: dto.name.trim(),
       email: dto.email.toLowerCase(),
@@ -89,11 +89,9 @@ export class AuthService {
   async login(dto: LoginDto, res: Response) {
     const user = await this.users.findByEmail(dto.email);
     if (!user || !(await bcrypt.compare(dto.password, user.passwordHash)))
-      throw new UnauthorizedException(
-        'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-      );
+      throw new UnauthorizedException(MK.invalidCredentials);
     if (user.status === 'suspended')
-      throw new ForbiddenException('هذا الحساب موقوف — تواصل مع الإدارة');
+      throw new ForbiddenException(MK.accountSuspended);
     return this.issueTokens(user, res);
   }
 
@@ -104,28 +102,28 @@ export class AuthService {
       user.role !== 'admin' ||
       !(await bcrypt.compare(dto.password, user.passwordHash))
     )
-      throw new UnauthorizedException('اسم المستخدم أو كلمة المرور غير صحيحة');
+      throw new UnauthorizedException(MK.invalidAdminCredentials);
     return this.issueTokens(user, res);
   }
 
   async refresh(token: string | undefined, res: Response) {
-    if (!token) throw new UnauthorizedException('لا توجد جلسة');
+    if (!token) throw new UnauthorizedException(MK.noSession);
     let payload: JwtUser;
     try {
       payload = await this.jwt.verifyAsync<JwtUser>(token, {
         secret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
       });
     } catch {
-      throw new UnauthorizedException('انتهت الجلسة — سجّل الدخول مجدداً');
+      throw new UnauthorizedException(MK.sessionExpired);
     }
     const user = await this.users.findById(payload.sub);
     if (
       !user.refreshTokenHash ||
       !(await bcrypt.compare(token, user.refreshTokenHash))
     )
-      throw new UnauthorizedException('انتهت الجلسة — سجّل الدخول مجدداً');
+      throw new UnauthorizedException(MK.sessionExpired);
     if (user.status === 'suspended')
-      throw new ForbiddenException('هذا الحساب موقوف — تواصل مع الإدارة');
+      throw new ForbiddenException(MK.accountSuspended);
     return this.issueTokens(user, res);
   }
 

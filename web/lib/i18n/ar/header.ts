@@ -1,0 +1,19 @@
+export const header = {
+  brandName: "الأستاذ محمد حجاج",
+  brandTag: "منصة تعليمية أزهرية",
+  nav: {
+    home: "الرئيسية",
+    courses: "الكورسات",
+    pricing: "الباقات والأسعار",
+    about: "عن الأستاذ",
+    faq: "الأسئلة الشائعة",
+    contact: "تواصل معنا",
+  },
+  myDashboard: "لوحتي",
+  logout: "خروج",
+  login: "دخول",
+  createAccount: "أنشئ حسابك",
+  menu: "القائمة",
+  studentDashboard: "لوحة الطالب",
+  newAccount: "حساب جديد",
+};
