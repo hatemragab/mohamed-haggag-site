@@ -31,6 +31,9 @@ interface AuthCtx {
 
 const AuthContext = createContext<AuthCtx | null>(null);
 
+/** localStorage flag: "this browser logged in before" — gates the silent refresh. */
+const SESSION_HINT = "mh_session_hint";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [summary, setSummary] = useState<MeSummary | null>(null);
@@ -38,9 +41,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadSession = useCallback(async () => {
     try {
-      const me = await apiGet<AuthUser>("/auth/me");
+      // /auth/me is public and returns {user:null} for anonymous visitors (no 401 noise).
+      let { user: me } = await apiGet<{ user: AuthUser | null }>("/auth/me");
+      // Access token expired but we likely still hold a refresh cookie
+      // (hint set on login) → one silent refresh attempt, then retry.
+      if (!me && localStorage.getItem(SESSION_HINT)) {
+        try {
+          await apiPost("/auth/refresh");
+          ({ user: me } = await apiGet<{ user: AuthUser | null }>("/auth/me"));
+        } catch {
+          localStorage.removeItem(SESSION_HINT);
+        }
+      }
       setUser(me);
-      setSummary(await apiGet<MeSummary>("/me/summary"));
+      setSummary(me ? await apiGet<MeSummary>("/me/summary") : null);
     } catch {
       setUser(null);
       setSummary(null);
@@ -59,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       await apiPost<AuthUser>("/auth/login", { email, password });
+      localStorage.setItem(SESSION_HINT, "1");
       await loadSession();
     },
     [loadSession],
@@ -72,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       phone?: string;
     }) => {
       await apiPost<AuthUser>("/auth/register", data);
+      localStorage.setItem(SESSION_HINT, "1");
       await loadSession();
     },
     [loadSession],
@@ -81,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await apiPost("/auth/logout");
     } finally {
+      localStorage.removeItem(SESSION_HINT);
       setUser(null);
       setSummary(null);
     }

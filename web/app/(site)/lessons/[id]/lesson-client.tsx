@@ -95,7 +95,7 @@ export function LessonClient({ ctx }: { ctx: LessonContext }) {
                 <iframe
                   title={`الدرس ${lesson.order}: ${lesson.title}`}
                   src={`https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&autoplay=1&playsinline=1&color=white`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
                 ></iframe>

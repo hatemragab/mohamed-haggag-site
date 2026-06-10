@@ -56,8 +56,13 @@ export class AuthController {
     return this.auth.logout(user?.sub, res);
   }
 
+  /**
+   * Public on purpose: anonymous visitors get 200 + {user:null} instead of a
+   * 401 (a 401 here would print a console error on every page load).
+   */
+  @Public()
   @Get('me')
-  me(@CurrentUser() user: JwtUser) {
-    return this.auth.me(user.sub);
+  async me(@CurrentUser() user: JwtUser | undefined) {
+    return { user: user ? await this.auth.me(user.sub) : null };
   }
 }

@@ -37,7 +37,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ar" dir="rtl" className={`${tajawal.variable} ${amiri.variable}`}>
+    <html
+      lang="ar"
+      dir="rtl"
+      data-scroll-behavior="smooth"
+      className={`${tajawal.variable} ${amiri.variable}`}
+    >
       <body>
         <AuthProvider>{children}</AuthProvider>
       </body>
