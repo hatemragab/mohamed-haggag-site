@@ -147,7 +147,8 @@ export default function TestimonialsClient() {
             key={t.id}
             style={{
               display: "flex", alignItems: "flex-start", gap: "14px", padding: "16px 18px",
-              ...(i < 3 ? { borderColor: "rgba(191,145,64,.35)" } : {}),
+              // full shorthand (not borderColor) to avoid React's shorthand/longhand mix warning
+              ...(i < 3 ? { border: "1px solid rgba(191,145,64,.35)" } : {}),
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "3px", flexShrink: 0, marginTop: "2px" }}>

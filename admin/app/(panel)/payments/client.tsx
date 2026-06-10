@@ -86,7 +86,7 @@ export default function PaymentsClient() {
             <span style={{ color: "#fff", fontWeight: 800, fontSize: "14px" }}>{arNum(p.amount)} {CURRENCY_LABELS[p.currency]}</span>
             <span style={{ color: "var(--text-mute)", fontSize: "13px" }}>{arDate(p.createdAt)}</span>
             <span style={{ justifySelf: "start", fontSize: "11.5px", fontWeight: 700, color: p.status === "paid" ? "var(--ok)" : "var(--bad)", background: p.status === "paid" ? "rgba(63,125,94,.18)" : "rgba(180,69,47,.16)", padding: "4px 12px", borderRadius: "999px" }}>{ORDER_STATUS_AR[p.status]}</span>
-            <button onClick={() => void del(p)} style={{ width: 34, height: 34, borderRadius: "9px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}><Icon name="x" size={16} /></button>
+            <button onClick={() => void del(p)} title="حذف" style={{ width: 34, height: 34, borderRadius: "9px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}><Icon name="x" size={16} /></button>
           </div>
         ))}
       </ACard>

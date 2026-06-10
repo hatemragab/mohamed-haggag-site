@@ -144,7 +144,7 @@ export default function CategoriesClient() {
             <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
               <ABtn size="sm" tone="ghost" icon="layers" onClick={() => setSubsFor(c)}>المستويات</ABtn>
               <ABtn size="sm" tone="outline" icon="book" onClick={() => openEdit(c)}>تعديل</ABtn>
-              <button onClick={() => void del(c)} style={{ width: 36, height: 36, borderRadius: "10px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}>
+              <button title="حذف" onClick={() => void del(c)} style={{ width: 36, height: 36, borderRadius: "10px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}>
                 <Icon name="x" size={17} />
               </button>
             </div>
@@ -305,7 +305,7 @@ function SubsModal({
                     {s.note && (
                       <span style={{ color: "var(--text-dim)", fontSize: "11.5px", flexShrink: 0 }}>{s.note}</span>
                     )}
-                    <button onClick={() => void delSub(g.key, s.key)} style={{ color: "var(--bad)", flexShrink: 0 }}>
+                    <button title="حذف" onClick={() => void delSub(g.key, s.key)} style={{ color: "var(--bad)", flexShrink: 0 }}>
                       <Icon name="x" size={15} />
                     </button>
                   </div>

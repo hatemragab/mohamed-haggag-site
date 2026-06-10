@@ -163,7 +163,7 @@ export default function StudentsClient() {
             <span style={{ color: "var(--text-mute)", fontSize: "13px", direction: "ltr", textAlign: "right" }}>{s.email}</span>
             <span style={{ color: "var(--text-soft)", fontSize: "13px" }}>{s.plan}</span>
             <button onClick={() => toggle(s)} style={{ justifySelf: "start", fontSize: "11.5px", fontWeight: 700, color: s.status === "active" ? "var(--ok)" : "var(--bad)", background: s.status === "active" ? "rgba(63,125,94,.18)" : "rgba(180,69,47,.16)", padding: "4px 12px", borderRadius: "999px" }}>{STATUS_AR[s.status]}</button>
-            <button onClick={() => del(s)} style={{ width: 34, height: 34, borderRadius: "9px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}><Icon name="x" size={16} /></button>
+            <button onClick={() => del(s)} title="حذف" style={{ width: 34, height: 34, borderRadius: "9px", background: "rgba(180,69,47,.16)", color: "var(--bad)", display: "grid", placeItems: "center" }}><Icon name="x" size={16} /></button>
           </div>
         ))}
         {list.length === 0 && <div style={{ color: "var(--text-dim)", textAlign: "center", padding: "36px", fontSize: "14px" }}>لا توجد نتائج مطابقة.</div>}
