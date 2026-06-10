@@ -5,6 +5,11 @@ export const home = {
   heroBadge: "تعليم أزهري موثوق",
   heroCtaRegister: "أنشئ حسابك الآن",
   heroCtaBrowse: "استعرض الكورسات",
+  continueLearning: "استمر في التعلم",
+
+  // Continue strip
+  continueTitle: "تابع من حيث توقفت",
+  minuteUnit: "دقيقة",
   instructorAlt: "الأستاذ محمد حجاج",
   instructorName: "الأستاذ محمد حجاج",
   instructorTitle: "خريج كلية الشريعة الإسلامية — الأزهر الشريف",
@@ -45,4 +50,5 @@ export const home = {
   ctaSub: "أنشئ حسابك مجاناً، عاينِ الدروس التجريبية، ثم اختر مسارك وابدأ التعلّم بثقة.",
   ctaRegister: "أنشئ حسابك الآن",
   ctaPricing: "الباقات والأسعار",
+  goToDashboard: "اذهب إلى لوحتي",
 };

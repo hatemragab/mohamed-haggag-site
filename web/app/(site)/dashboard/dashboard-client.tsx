@@ -97,8 +97,8 @@ export function DashboardClient({
           <div style={{ background: "var(--paper)", borderRadius: "var(--r-lg)", border: "1px dashed var(--line)", padding: "56px 24px", textAlign: "center" }}>
             <div style={{ width: 76, height: 76, borderRadius: "50%", background: "var(--gold-100)", color: "var(--gold-700)", display: "grid", placeItems: "center", margin: "0 auto 20px" }}><Icon name="lock" size={34} /></div>
             <h3 style={{ fontSize: "20px", marginBottom: "10px" }}>{t.dashboard.emptyTitle}</h3>
-            <p style={{ color: "var(--ink-2)", fontSize: "15.5px", maxWidth: "420px", margin: "0 auto 24px" }}>{t.dashboard.emptyBody}</p>
-            <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/pricing")}>{t.dashboard.browsePlans}</Btn>
+            <p style={{ color: "var(--ink-2)", fontSize: "15.5px", maxWidth: "420px", margin: "0 auto 24px" }}>{t.dashboard.emptyText}</p>
+            <Btn variant="gold" size="lg" icon="arrow" onClick={() => router.push("/courses")}>{t.dashboard.emptyCta}</Btn>
           </div>
         ) : (
           <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "22px", marginBottom: "44px" }}>

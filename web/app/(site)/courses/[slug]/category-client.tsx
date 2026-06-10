@@ -27,7 +27,7 @@ export function CategoryClient({
   singlePlan: Plan | null;
 }) {
   const router = useRouter();
-  const { isUnlocked } = useAuth();
+  const { user, isUnlocked } = useAuth();
   const { t, num } = useLocale();
   const unlocked = isUnlocked(category.id);
   // مجموعات الساب (الأزهر فيه groups)
@@ -38,6 +38,9 @@ export function CategoryClient({
   const [tab, setTab] = useState(groups[0]?.key ?? "main");
   const [openSub, setOpenSub] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const hasFreeLesson = groups.some((g) =>
+    g.levels.some((lv) => lv.lessons.some((l) => l.free)),
+  );
   const activeGroup = groups.find((g) => g.key === tab) ?? groups[0];
   const subs = (activeGroup?.levels ?? []).filter(
     (s) => q === "" || s.title.includes(q) || (s.note ?? "").includes(q),
@@ -67,6 +70,11 @@ export function CategoryClient({
               </div>
               <div style={{ color: "var(--gold-200)", fontSize: "15px", fontWeight: 700, marginBottom: "10px" }}>{category.tagline}</div>
               <p style={{ color: "#c5d2dd", fontSize: "16px", lineHeight: 1.8, maxWidth: "680px" }}>{category.desc}</p>
+              {!unlocked && hasFreeLesson && (
+                <div style={{ marginTop: "12px" }}>
+                  <Badge tone="gold"><Icon name="play" size={14} /> {t.category.tryFreeFirst}</Badge>
+                </div>
+              )}
             </div>
             {!unlocked && (
               <div style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)", borderRadius: "var(--r)", padding: "20px", minWidth: "230px" }}>
@@ -79,6 +87,12 @@ export function CategoryClient({
                   </div>
                 )}
                 <Btn variant="gold" full icon="unlock" onClick={goCheckout}>{t.category.buyTrack}</Btn>
+                {!user && (
+                  <div style={{ fontSize: "13px", color: "var(--muted)", textAlign: "center", marginTop: "10px" }}>
+                    {t.category.haveAccount}{" "}
+                    <Link href="/login" style={{ color: "var(--gold-400)", fontWeight: 700 }}>{t.category.loginLink}</Link>
+                  </div>
+                )}
                 <div style={{ fontSize: "12px", color: "#9fb0bf", marginTop: "10px", textAlign: "center" }}>{t.category.firstLessonFree}</div>
               </div>
             )}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Badge, Btn, Icon, Ornament } from "@/components/ui";
+import { useAuth } from "@/components/auth-context";
 import { useLocale } from "@/components/locale-context";
 import { CURRENCIES, type Plan } from "@/lib/types";
 
@@ -12,7 +13,9 @@ type Currency = (typeof CURRENCIES)[number];
 export function PricingClient({ plans }: { plans: Plan[] }) {
   const router = useRouter();
   const { t, num } = useLocale();
+  const { user, summary, loading } = useAuth();
   const [cur, setCur] = useState<Currency>(CURRENCIES[0]);
+  const all = summary?.unlockedAll ?? user?.unlockedAll ?? false;
 
   return (
     <div>
@@ -59,10 +62,17 @@ export function PricingClient({ plans }: { plans: Plan[] }) {
                       </div>
                     ))}
                   </div>
-                  <Btn variant={p.highlight ? "gold" : "primary"} size="lg" full iconAfter="arrow" onClick={() => router.push(`/checkout?plan=${p.key}`)}>{p.cta}</Btn>
+                  {all && p.key !== "single" ? (
+                    <Btn variant="soft" size="lg" full disabled>{t.pricing.alreadyUnlocked}</Btn>
+                  ) : (
+                    <Btn variant={p.highlight ? "gold" : "primary"} size="lg" full iconAfter="arrow" onClick={() => router.push(`/checkout?plan=${p.key}`)}>{p.cta}</Btn>
+                  )}
                 </div>
               ))}
             </div>
+          )}
+          {!loading && !user && plans.length > 0 && (
+            <p style={{ textAlign: "center", marginTop: "26px", color: "var(--muted)", fontSize: "14px" }}>{t.pricing.guestHint}</p>
           )}
           <div style={{ textAlign: "center", marginTop: "40px", display: "flex", gap: "28px", justifyContent: "center", flexWrap: "wrap", color: "var(--ink-2)", fontSize: "14.5px", fontWeight: 600 }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}><Icon name="shield" size={18} style={{ color: "var(--green)" }} /> {t.pricing.trustSecure}</span>

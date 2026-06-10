@@ -7,9 +7,10 @@ export const dashboard = {
   statInProgress: "قيد المتابعة",
   continueWatching: "أكمل المشاهدة",
   myCourses: "كورساتي",
-  emptyTitle: "لم تفتح أي مسار بعد",
-  emptyBody:
-    "اختر مساراً أو باقة لتفتح الدروس وتبدأ رحلة التعلّم. الدرس الأول من كل وحدة متاح للمعاينة مجاناً.",
+  emptyTitle: "ابدأ رحلتك التعليمية",
+  emptyText:
+    "استعرض المسارات وجرّب الدروس المجانية، ثم افتح المسار الذي يناسبك.",
+  emptyCta: "استعرض الكورسات",
   browsePlans: "استعرض الباقات",
   levelUnit: "مستوى تعليمي",
   continueLearning: "تابع التعلّم",

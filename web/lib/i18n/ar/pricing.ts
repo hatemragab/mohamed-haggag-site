@@ -7,6 +7,8 @@ export const pricing = {
   emptyTitle: "لا توجد باقات متاحة حالياً",
   emptySubtitle: "يرجى المحاولة لاحقاً.",
   mostPopular: "الأكثر اختياراً",
+  alreadyUnlocked: "مُفعّل لديك ✓",
+  guestHint: "يلزم تسجيل الدخول لإتمام الشراء — الدفع آمن ومشفّر",
   trustSecure: "دفع آمن ومشفّر",
   trustRefund: "ضمان استرداد ٧ أيام",
   trustPayments: "بطاقات ومحافظ إلكترونية",

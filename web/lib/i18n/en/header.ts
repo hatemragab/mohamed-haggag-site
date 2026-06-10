@@ -16,4 +16,5 @@ export const header = {
   menu: "Menu",
   studentDashboard: "Student Dashboard",
   newAccount: "New account",
+  studentBadge: "Student",
 };

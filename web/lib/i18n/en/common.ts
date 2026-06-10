@@ -1,5 +1,6 @@
 /** Shared UI words reused across pages. */
 export const common = {
+  skipToContent: "Skip to content",
   loading: "Loading…",
   retry: "Try again",
   errorGeneric: "An unexpected error occurred",

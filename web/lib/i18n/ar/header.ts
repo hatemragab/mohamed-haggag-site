@@ -16,4 +16,5 @@ export const header = {
   menu: "القائمة",
   studentDashboard: "لوحة الطالب",
   newAccount: "حساب جديد",
+  studentBadge: "طالب",
 };

@@ -1,5 +1,6 @@
 /** Shared UI words reused across pages. */
 export const common = {
+  skipToContent: "تخطَّ إلى المحتوى",
   loading: "جارٍ التحميل…",
   retry: "إعادة المحاولة",
   errorGeneric: "حدث خطأ غير متوقع",

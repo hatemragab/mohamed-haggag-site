@@ -338,3 +338,19 @@ h4 {
     display: none;
   }
 }
+
+/* رابط التخطي (وصولية) — مخفي حتى يستقبل تركيز لوحة المفاتيح */
+.skip-link {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: -48px;
+  z-index: 100;
+  background: var(--navy-900);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 12px;
+}

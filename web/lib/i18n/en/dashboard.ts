@@ -7,9 +7,10 @@ export const dashboard = {
   statInProgress: "In progress",
   continueWatching: "Continue watching",
   myCourses: "My courses",
-  emptyTitle: "You haven't opened any track yet",
-  emptyBody:
-    "Choose a track or plan to unlock the lessons and begin your learning journey. The first lesson of every unit is free to preview.",
+  emptyTitle: "Start your learning journey",
+  emptyText:
+    "Browse the tracks, try the free lessons, then unlock the track that suits you.",
+  emptyCta: "Browse courses",
   browsePlans: "Browse plans",
   levelUnit: "levels",
   continueLearning: "Continue learning",

@@ -45,7 +45,7 @@ function LangToggle({
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const { t, locale, toggle } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -103,9 +103,24 @@ export function Header() {
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }} className="desk-cta">
           <LangToggle label={otherLabel} onToggle={toggle} />
-          {user ? (
+          {loading ? (
+            <span aria-hidden="true" style={{ display: "inline-block", width: 38, height: 38 }} />
+          ) : user ? (
             <>
-              <Btn variant="ghost" size="sm" icon="grid" onClick={() => router.push("/dashboard")}>{t.header.myDashboard}</Btn>
+              <button
+                onClick={() => router.push("/dashboard")}
+                title={t.header.myDashboard}
+                onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(1.03)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "8px",
+                  padding: "8px 16px", borderRadius: "999px",
+                  background: "var(--gold-100)", color: "var(--navy-900)",
+                  fontWeight: 700, fontSize: "14px", transition: "filter .2s",
+                }}
+              >
+                <Icon name="user" size={16} /> {user.name.split(" ")[0] || user.name}
+              </button>
               <button
                 onClick={() => { void logout().then(() => router.push("/")); }}
                 title={t.header.logout}
@@ -147,9 +162,23 @@ export function Header() {
           <div style={{ marginTop: "16px", marginBottom: "12px" }}>
             <LangToggle label={otherLabel} onToggle={toggle} full />
           </div>
+          {user && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+              <span style={{ width: 38, height: 38, borderRadius: "999px", background: "var(--gold-100)", color: "var(--navy-900)", display: "grid", placeItems: "center" }}>
+                <Icon name="user" size={18} />
+              </span>
+              <span style={{ textAlign: "start", lineHeight: 1.3 }}>
+                <span style={{ display: "block", fontWeight: 800, fontSize: "15px", color: "var(--navy-900)" }}>{user.name}</span>
+                <span style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "var(--ink-2)" }}>{t.header.studentBadge}</span>
+              </span>
+            </div>
+          )}
           <div style={{ display: "flex", gap: "10px" }}>
-            {user ? (
-              <Btn variant="primary" full onClick={() => { setOpen(false); router.push("/dashboard"); }}>{t.header.studentDashboard}</Btn>
+            {loading ? null : user ? (
+              <>
+                <Btn variant="primary" full onClick={() => { setOpen(false); router.push("/dashboard"); }}>{t.header.studentDashboard}</Btn>
+                <Btn variant="outline" full onClick={() => { void logout().then(() => { setOpen(false); router.push("/"); }); }}>{t.header.logout}</Btn>
+              </>
             ) : (
               <>
                 <Btn variant="outline" full onClick={() => { setOpen(false); router.push("/login"); }}>{t.header.login}</Btn>

@@ -5,6 +5,11 @@ export const home = {
   heroBadge: "Trusted Azhari education",
   heroCtaRegister: "Create your account now",
   heroCtaBrowse: "Browse courses",
+  continueLearning: "Continue learning",
+
+  // Continue strip
+  continueTitle: "Pick up where you left off",
+  minuteUnit: "min",
   instructorAlt: "Mohamed Haggag",
   instructorName: "Mohamed Haggag",
   instructorTitle: "Graduate of the Faculty of Islamic Sharia — Al-Azhar",
@@ -45,4 +50,5 @@ export const home = {
   ctaSub: "Create your account for free, preview the trial lessons, then choose your track and learn with confidence.",
   ctaRegister: "Create your account now",
   ctaPricing: "Plans & pricing",
+  goToDashboard: "Go to my dashboard",
 };

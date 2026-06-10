@@ -7,6 +7,8 @@ export const pricing = {
   emptyTitle: "No plans available right now",
   emptySubtitle: "Please try again later.",
   mostPopular: "Most popular",
+  alreadyUnlocked: "Already unlocked ✓",
+  guestHint: "You'll need to sign in to complete your purchase — payments are secure and encrypted",
   trustSecure: "Secure, encrypted payment",
   trustRefund: "7-day money-back guarantee",
   trustPayments: "Bank cards & e-wallets",

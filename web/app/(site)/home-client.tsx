@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "@/components/auth-context";
 import { CategoryCard } from "@/components/category-card";
 import { useLocale } from "@/components/locale-context";
 import { Btn, Counter, Icon, Ornament } from "@/components/ui";
@@ -12,6 +14,7 @@ import type { CategoryListItem, SiteContent, Testimonial } from "@/lib/types";
 function Hero({ hero }: { hero: SiteContent["hero"] }) {
   const router = useRouter();
   const { t } = useLocale();
+  const { user } = useAuth();
   return (
     <section style={{ position: "relative", overflow: "hidden", background: "linear-gradient(160deg,#fdfaf4 0%,#f5eede 100%)" }}>
       {/* زخارف خلفية */}
@@ -33,7 +36,11 @@ function Hero({ hero }: { hero: SiteContent["hero"] }) {
             {hero.sub}
           </p>
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-            <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/register")}>{t.home.heroCtaRegister}</Btn>
+            {user ? (
+              <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/dashboard")}>{t.home.continueLearning}</Btn>
+            ) : (
+              <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/register")}>{t.home.heroCtaRegister}</Btn>
+            )}
             <Btn variant="outline" size="lg" icon="grid" onClick={() => router.push("/courses")}>{t.home.heroCtaBrowse}</Btn>
           </div>
         </div>
@@ -57,6 +64,34 @@ function Hero({ hero }: { hero: SiteContent["hero"] }) {
               <div style={{ fontSize: "12.5px", color: "var(--muted)" }}>{t.home.floatCardText}</div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContinueStrip() {
+  const { t, num } = useLocale();
+  const { user, summary } = useAuth();
+  const items = summary?.continueWatching ?? [];
+  if (!user || items.length === 0) return null;
+  return (
+    <section style={{ padding: "40px 0" }}>
+      <div className="wrap">
+        <h2 style={{ fontSize: "22px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "10px" }}>
+          <Icon name="play" size={20} style={{ color: "var(--gold-700)" }} /> {t.home.continueTitle}
+        </h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "14px" }}>
+          {items.slice(0, 3).map((item) => (
+            <Link key={item.lessonId} href={`/lessons/${item.lessonId}`}
+              style={{ display: "flex", alignItems: "center", gap: "12px", background: "var(--paper)", border: "1px solid var(--line)", borderRadius: "var(--r)", padding: "14px 16px", boxShadow: "var(--shadow-sm)", flexGrow: 1, minWidth: "240px" }}>
+              <span style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gold-100)", color: "var(--gold-700)", display: "grid", placeItems: "center", flexShrink: 0 }}><Icon name="play" size={16} /></span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 800, color: "var(--navy-900)", fontSize: "15px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</div>
+                <div style={{ fontSize: "13px", color: "var(--muted)", marginTop: "2px" }}>{item.categoryTitle} · {num(item.durationMinutes)} {t.home.minuteUnit}</div>
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -278,6 +313,7 @@ function FaqPreview({ faq }: { faq: SiteContent["faq"] }) {
 function FinalCTA() {
   const router = useRouter();
   const { t } = useLocale();
+  const { user } = useAuth();
   return (
     <section style={{ padding: "20px 24px 90px" }}>
       <div className="wrap">
@@ -289,8 +325,17 @@ function FinalCTA() {
             <h2 style={{ color: "#fff", fontSize: "clamp(28px,4vw,44px)", marginBottom: "18px", maxWidth: "720px", marginInline: "auto" }}>{t.home.ctaTitle}</h2>
             <p style={{ color: "#c5d2dd", fontSize: "18px", maxWidth: "560px", margin: "0 auto 34px", lineHeight: 1.8 }}>{t.home.ctaSub}</p>
             <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-              <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/register")}>{t.home.ctaRegister}</Btn>
-              <Btn variant="white" size="lg" icon="card" onClick={() => router.push("/pricing")}>{t.home.ctaPricing}</Btn>
+              {user ? (
+                <>
+                  <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/dashboard")}>{t.home.goToDashboard}</Btn>
+                  <Btn variant="white" size="lg" icon="grid" onClick={() => router.push("/courses")}>{t.home.heroCtaBrowse}</Btn>
+                </>
+              ) : (
+                <>
+                  <Btn variant="gold" size="lg" iconAfter="arrow" onClick={() => router.push("/register")}>{t.home.ctaRegister}</Btn>
+                  <Btn variant="white" size="lg" icon="card" onClick={() => router.push("/pricing")}>{t.home.ctaPricing}</Btn>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -315,6 +360,7 @@ export function HomeClient({
   return (
     <>
       <Hero hero={content.hero} />
+      <ContinueStrip />
       <StatsStrip stats={content.instructor.stats} />
       <WhySection why={content.why} />
       <LearnSection learnSection={content.learnSection} learn={content.learn} />
