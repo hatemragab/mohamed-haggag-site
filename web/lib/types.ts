@@ -15,7 +15,7 @@ export interface SiteContent {
   learn: string[];
   accessSteps: { n: number; title: string; text: string }[];
   faq: { q: string; a: string }[];
-  contact: { email: string; whatsapp: string; phone: string };
+  contact: { email: string; whatsapp: string; phone: string; facebook?: string; whatsappQr?: string };
   terms: { title: string; body: string }[];
   footerText: string;
 }

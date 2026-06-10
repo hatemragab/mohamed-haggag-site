@@ -57,6 +57,9 @@ export class ContactInfo {
   @Prop({ required: true }) email: string;
   @Prop({ required: true }) whatsapp: string;
   @Prop({ required: true }) phone: string;
+  // Optional (added after launch): docs seeded earlier may not have them.
+  @Prop() facebook?: string;
+  @Prop() whatsappQr?: string;
 }
 
 @Schema({ _id: false })

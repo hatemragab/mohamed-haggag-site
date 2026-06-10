@@ -373,6 +373,10 @@ export default function Client() {
           <AInput label="واتساب" value={st.contact.whatsapp} onChange={(e) => set({ contact: { ...st.contact, whatsapp: e.target.value } })} mono />
           <AInput label="الهاتف" value={st.contact.phone} onChange={(e) => set({ contact: { ...st.contact, phone: e.target.value } })} mono />
         </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "12px" }} className="admin-selectors">
+          <AInput label="رابط صفحة فيسبوك" value={st.contact.facebook ?? ""} onChange={(e) => set({ contact: { ...st.contact, facebook: e.target.value } })} mono />
+          <AInput label="رابط واتساب (QR)" value={st.contact.whatsappQr ?? ""} onChange={(e) => set({ contact: { ...st.contact, whatsappQr: e.target.value } })} mono />
+        </div>
         <SaveBar onSave={saveContact}>حفظ بيانات التواصل</SaveBar>
       </ACard>
 

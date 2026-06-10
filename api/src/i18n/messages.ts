@@ -195,6 +195,10 @@ export const MESSAGES = {
     ar: 'اكتب رسالتك',
     en: 'Write your message',
   },
+  contactLinkInvalid: {
+    ar: 'رابط غير صالح — يجب أن يبدأ بـ http أو https',
+    en: 'Invalid link — it must start with http or https',
+  },
 } satisfies Record<string, Entry>;
 
 export type MsgKey = keyof typeof MESSAGES;
@@ -213,5 +217,10 @@ export function resolveLocale(input?: string | null): Locale {
 /** Translate a message key; unknown strings (non-keys) pass through unchanged. */
 export function translate(message: string, locale: Locale): string {
   const entry = (MESSAGES as Record<string, Entry>)[message];
-  return entry ? entry[locale] : message;
+  if (entry) return entry[locale];
+  // Nested-DTO validation messages arrive as "<property path>.<key>" (the
+  // ValidationPipe prefixes the path). Translate the key, drop the path.
+  const tail = message.slice(message.lastIndexOf('.') + 1);
+  const tailEntry = (MESSAGES as Record<string, Entry>)[tail];
+  return tailEntry ? tailEntry[locale] : message;
 }

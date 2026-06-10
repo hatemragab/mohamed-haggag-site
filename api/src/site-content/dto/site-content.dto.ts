@@ -4,8 +4,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { MK } from '../../i18n/messages';
 
 export class HeroDto {
   @IsString() title: string;
@@ -57,6 +60,23 @@ export class ContactInfoDto {
   @IsString() email: string;
   @IsString() whatsapp: string;
   @IsString() phone: string;
+  // Rendered into href on the public site — restrict to web URLs so a
+  // compromised admin account can't store javascript: links ('' = cleared).
+  @IsOptional()
+  @ValidateIf((_, v: unknown) => v !== '')
+  @IsUrl(
+    { protocols: ['http', 'https'], require_protocol: true },
+    { message: MK.contactLinkInvalid },
+  )
+  facebook?: string;
+
+  @IsOptional()
+  @ValidateIf((_, v: unknown) => v !== '')
+  @IsUrl(
+    { protocols: ['http', 'https'], require_protocol: true },
+    { message: MK.contactLinkInvalid },
+  )
+  whatsappQr?: string;
 }
 
 export class TermsSectionDto {

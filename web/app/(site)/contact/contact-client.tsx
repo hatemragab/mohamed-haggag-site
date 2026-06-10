@@ -6,6 +6,22 @@ import { Badge, Btn, Field, Icon, type IconName } from "@/components/ui";
 import { ApiError, apiPost } from "@/lib/client";
 import type { SiteContent } from "@/lib/types";
 
+// Fallbacks for site-content docs seeded before these contact fields existed;
+// admin-entered values (when present) always win.
+const WHATSAPP_QR_LINK = "https://wa.me/qr/EYLQ7UJNSD26H1";
+const FACEBOOK_PAGE = "https://www.facebook.com/share/17rpnUeHDs/";
+
+// Admin-stored values land in href — only web URLs may pass, so a compromised
+// admin account can't plant javascript: links on the public site.
+const safeHttpUrl = (u?: string) => {
+  try {
+    const p = new URL(u ?? "");
+    return p.protocol === "https:" || p.protocol === "http:" ? p.toString() : null;
+  } catch {
+    return null;
+  }
+};
+
 export function ContactClient({ contact }: { contact: SiteContent["contact"] }) {
   const { t } = useLocale();
   const [sent, setSent] = useState(false);
@@ -13,10 +29,14 @@ export function ContactClient({ contact }: { contact: SiteContent["contact"] }) 
   const [error, setError] = useState("");
   const [f, setF] = useState({ name: "", email: "", msg: "" });
 
-  const cards: { ic: IconName; label: string; val: string }[] = [
-    { ic: "mail", label: t.contact.emailLabel, val: contact.email },
-    { ic: "whatsapp", label: t.contact.whatsappLabel, val: contact.whatsapp },
-    { ic: "phone", label: t.contact.phoneLabel, val: contact.phone },
+  const waLink = safeHttpUrl(contact.whatsappQr) ?? WHATSAPP_QR_LINK;
+  const fbLink = safeHttpUrl(contact.facebook) ?? FACEBOOK_PAGE;
+
+  const cards: { ic: IconName; label: string; val: string; href?: string; ltr?: boolean }[] = [
+    { ic: "mail", label: t.contact.emailLabel, val: contact.email, href: `mailto:${contact.email}`, ltr: true },
+    { ic: "whatsapp", label: t.contact.whatsappLabel, val: contact.whatsapp, href: waLink, ltr: true },
+    { ic: "phone", label: t.contact.phoneLabel, val: contact.phone, ltr: true },
+    { ic: "facebook", label: t.contact.facebookLabel, val: t.contact.facebookValue, href: fbLink },
   ];
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -42,15 +62,45 @@ export function ContactClient({ contact }: { contact: SiteContent["contact"] }) 
           <h1 style={{ fontSize: "clamp(28px,3.6vw,40px)", marginBottom: "14px" }}>{t.contact.heading}</h1>
           <p style={{ color: "var(--ink-2)", fontSize: "16.5px", lineHeight: 1.85, marginBottom: "30px" }}>{t.contact.intro}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {cards.map((c, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "16px", background: "var(--paper)", borderRadius: "var(--r)", padding: "18px 20px", border: "1px solid var(--line)", boxShadow: "var(--shadow-sm)" }}>
-                <span style={{ width: 48, height: 48, borderRadius: "13px", background: "var(--navy-900)", color: "var(--gold-400)", display: "grid", placeItems: "center", flexShrink: 0 }}><Icon name={c.ic} size={22} /></span>
-                <div>
-                  <div style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 600 }}>{c.label}</div>
-                  <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--navy-900)", direction: "ltr", textAlign: "start" }}>{c.val}</div>
-                </div>
-              </div>
-            ))}
+            {cards.map((c, i) => {
+              const inner = (
+                <>
+                  <span style={{ width: 48, height: 48, borderRadius: "13px", background: "var(--navy-900)", color: "var(--gold-400)", display: "grid", placeItems: "center", flexShrink: 0 }}><Icon name={c.ic} size={22} /></span>
+                  <div>
+                    <div style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 600 }}>{c.label}</div>
+                    <div style={{ fontSize: "16px", fontWeight: 800, color: "var(--navy-900)", direction: c.ltr ? "ltr" : undefined, textAlign: "start" }}>{c.val}</div>
+                  </div>
+                </>
+              );
+              const boxStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: "16px", background: "var(--paper)", borderRadius: "var(--r)", padding: "18px 20px", border: "1px solid var(--line)", boxShadow: "var(--shadow-sm)" };
+              return c.href ? (
+                <a
+                  key={i}
+                  href={c.href}
+                  {...(c.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  style={{ ...boxStyle, transition: "border-color .2s, transform .2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--gold)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.transform = "none"; }}
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={i} style={boxStyle}>{inner}</div>
+              );
+            })}
+          </div>
+
+          {/* QR واتساب */}
+          <div style={{ marginTop: "16px", background: "var(--paper)", borderRadius: "var(--r-lg)", border: "1px solid var(--line)", padding: "26px 24px", boxShadow: "var(--shadow-sm)", textAlign: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "9px", fontWeight: 800, fontSize: "16.5px", color: "var(--navy-900)", marginBottom: "8px" }}>
+              <span style={{ width: 30, height: 30, borderRadius: "9px", background: "var(--green)", color: "#fff", display: "grid", placeItems: "center" }}><Icon name="whatsapp" size={17} /></span>
+              {t.contact.qrTitle}
+            </div>
+            <p style={{ color: "var(--ink-2)", fontSize: "14px", lineHeight: 1.8, marginBottom: "14px" }}>{t.contact.qrHint}</p>
+            <img src="/whatsapp-qr.png" alt={t.contact.qrAlt} width={190} height={190} loading="lazy" style={{ display: "block", margin: "0 auto 12px", borderRadius: "14px", border: "1px solid var(--line-2)", background: "#fff" }} />
+            <a href={waLink} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "7px", color: "var(--green)", fontWeight: 800, fontSize: "14.5px" }}>
+              <Icon name="whatsapp" size={16} /> {t.contact.qrOpenChat}
+            </a>
           </div>
         </div>
         <div style={{ background: "var(--paper)", borderRadius: "var(--r-lg)", border: "1px solid var(--line)", padding: "36px", boxShadow: "var(--shadow)" }}>

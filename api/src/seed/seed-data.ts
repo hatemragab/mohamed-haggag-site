@@ -421,6 +421,8 @@ export const SITE_CONTENT = {
     email: 'info@haggag-academy.com',
     whatsapp: '+971 5X XXX XXXX',
     phone: '+20 1X XXXX XXXX',
+    facebook: 'https://www.facebook.com/share/17rpnUeHDs/',
+    whatsappQr: 'https://wa.me/qr/EYLQ7UJNSD26H1',
   },
   terms: [
     {

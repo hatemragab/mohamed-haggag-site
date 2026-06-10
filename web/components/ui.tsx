@@ -8,8 +8,8 @@ export type IconName =
   | "play" | "lock" | "unlock" | "check" | "user" | "search" | "arrow"
   | "arrowL" | "clock" | "book" | "layers" | "chevD" | "chevL" | "chevR"
   | "star" | "menu" | "x" | "globe" | "shield" | "card" | "grid" | "chart"
-  | "mail" | "phone" | "whatsapp" | "logout" | "cap" | "sparkle" | "eye"
-  | "eyeOff" | "up" | "down";
+  | "mail" | "phone" | "whatsapp" | "facebook" | "logout" | "cap" | "sparkle"
+  | "eye" | "eyeOff" | "up" | "down";
 
 export function Icon({
   name,
@@ -48,6 +48,7 @@ export function Icon({
     mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><polyline points="3 7 12 13 21 7" /></>,
     phone: <path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />,
     whatsapp: <path d="M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z" />,
+    facebook: <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />,
     logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></>,
     cap: <><path d="M22 9 12 4 2 9l10 5 10-5z" /><path d="M6 11v5c0 1 3 2.5 6 2.5s6-1.5 6-2.5v-5" /></>,
     sparkle: <path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z" fill="currentColor" stroke="none" />,
