@@ -5,8 +5,10 @@
 # Build context is the REPO ROOT (works for docker-compose AND CapRover,
 # whose context is always the repository root):
 #   build:  docker build -f api/Dockerfile -t haggag-api .
-#   run:    docker run -p 4000:4000 --env-file api/.env haggag-api
+#   run:    docker run -p 4000:80 --env-file api/.env haggag-api
 # CapRover: root ./captain-definition (or ./captain-definition-api) points here.
+# The container listens on PORT=80 — CapRover's default Container HTTP Port,
+# so its nginx maps the subdomain with zero port config.
 # ---------------------------------------------------------------------------
 
 FROM node:24-alpine AS base
@@ -33,11 +35,12 @@ RUN pnpm install --prod --frozen-lockfile
 
 # --- runtime: dist + prod node_modules, non-root -----------------------------
 FROM node:24-alpine AS runner
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    PORT=80
 WORKDIR /app
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --chown=node:node api/package.json ./
 USER node
-EXPOSE 4000
+EXPOSE 80
 CMD ["node", "dist/main.js"]

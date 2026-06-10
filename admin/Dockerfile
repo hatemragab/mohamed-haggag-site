@@ -9,6 +9,8 @@
 # CapRover: root ./captain-definition-admin points here. Set NEXT_PUBLIC_API_URL
 # and NEXT_PUBLIC_SITE_URL as App Config env vars — CapRover passes app env
 # vars as build args, which the ARG lines below pick up.
+# The container listens on PORT=80 — CapRover's default Container HTTP Port,
+# so its nginx maps the subdomain with zero port config.
 #
 # NEXT_PUBLIC_* values are inlined into the client bundle at BUILD time —
 # changing them requires a rebuild.
@@ -40,7 +42,7 @@ RUN pnpm build
 FROM node:24-alpine AS runner
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3001 \
+    PORT=80 \
     HOSTNAME=0.0.0.0
 WORKDIR /app
 RUN addgroup -S -g 1001 nodejs && adduser -S -u 1001 nextjs
@@ -48,5 +50,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
-EXPOSE 3001
+EXPOSE 80
 CMD ["node", "server.js"]
