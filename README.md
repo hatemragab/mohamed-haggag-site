@@ -126,7 +126,15 @@ Per-app setup in the CapRover dashboard:
    - **web** (build-time → baked into the bundle): `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_ADMIN_URL`; (runtime): `API_URL` — use the internal `http://srv-captain--haggag-api` for server-side fetches (containers listen on 80). CapRover passes app env vars as build args, which the Dockerfile `ARG` lines pick up; **changing a `NEXT_PUBLIC_*` value requires a rebuild** (push or “Force Build”).
    - **admin** (build-time): `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`.
 3. Enable HTTPS on all three apps. Keep web/admin/api on **one registrable domain** (e.g. `example.com`, `admin.example.com`, `api.example.com`) so the `SameSite=Lax` auth cookies flow; for cross-domain setups set `COOKIE_SAMESITE=none` on the api instead.
-4. Seed once the api is up: open the api app's terminal in CapRover (or `docker exec` on the server) and run `node dist/seed/seed.js` with `ADMIN_PASSWORD` set.
+4. **Seed once the api is up** — until you do, `/site-content` 404s and the web app errors on every page. SSH into the CapRover server and run the seed inside the api container (replace `haggag-api` with your app name):
+
+   ```bash
+   docker exec -e ADMIN_PASSWORD='ChooseAStrongAdminPassword' \
+     $(docker ps -q -f name=srv-captain--haggag-api) \
+     node dist/seed/seed.js
+   ```
+
+   The seed loads all content (6 categories, ~434 lessons, plans, testimonials, site content) and creates/updates the admin user; it **never touches student users**, so re-running it later to reset content is safe.
 
 ### `.env.prod` variables
 
