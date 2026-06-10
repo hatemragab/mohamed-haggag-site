@@ -1,0 +1,40 @@
+# Single .dockerignore for ALL images — every Docker build (docker-compose and
+# CapRover alike) uses the repo root as context, so only this file applies.
+# Keep the pnpm-lock.yaml files IN the context (needed for --frozen-lockfile).
+
+# the design prototype is never part of an image
+mohammed-haggag-courses_UI
+
+# dependencies & build output (rebuilt inside the image)
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/out
+**/coverage
+**/tsconfig.tsbuildinfo
+
+# secrets & local config — images get env at run/build time, never from files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# vcs / docs / tooling noise
+.git
+.gitignore
+**/Dockerfile
+.dockerignore
+*.log
+**/*.log
+README.md
+CLAUDE.md
+**/CLAUDE.md
+**/AGENTS.md
+DECISIONS.md
+PROGRESS.md
+.DS_Store
+**/.DS_Store
+api/test
+captain-definition*
+docker-compose*.yml

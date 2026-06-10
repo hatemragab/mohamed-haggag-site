@@ -93,6 +93,8 @@ Everything the visitor sees comes from MongoDB and is editable in the admin pane
 
 Everything ships as Docker images: `api/Dockerfile` (NestJS, multi-stage pnpm build), `web/Dockerfile` and `admin/Dockerfile` (Next.js `output: "standalone"`), orchestrated by `docker-compose.prod.yml` (mongo:7 with a named volume and **no host port**, api `:4000`, web `:3000`, admin `:3001`, all `restart: unless-stopped`).
 
+> All three Dockerfiles use the **repo root as build context** (`docker build -f api/Dockerfile .`) so the exact same files work for docker-compose and CapRover. A single root `.dockerignore` governs every build.
+
 ```bash
 cp .env.prod.example .env.prod    # fill in REAL values (see table below)
 docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
@@ -103,6 +105,27 @@ Then seed the database (content + admin user) **inside** the running api contain
 ```bash
 docker compose -f docker-compose.prod.yml exec api node dist/seed/seed.js
 ```
+
+### CapRover (deploy from GitHub)
+
+The repo root carries one captain-definition per app (CapRover's build context is always the repository root):
+
+| app | captain-definition path (DEPLOYMENT tab) | Dockerfile | Container HTTP Port |
+|---|---|---|---|
+| api | `./captain-definition` (default) or `./captain-definition-api` | `api/Dockerfile` | **4000** |
+| web (site) | `./captain-definition-web` | `web/Dockerfile` | **3000** |
+| admin | `./captain-definition-admin` | `admin/Dockerfile` | **3001** |
+
+Per-app setup in the CapRover dashboard:
+
+1. Create three apps (e.g. `haggag-api`, `haggag-web`, `haggag-admin`). For each, in **Deployment**, set the *captain-definition Relative Path* from the table (the api app can keep the default), and connect the GitHub repo/branch.
+2. In **HTTP Settings**, set *Container HTTP Port* from the table (CapRover defaults to 80 — the apps listen on their own ports).
+3. In **App Configs → Environment Variables**:
+   - **api** (runtime): `NODE_ENV=production`, `MONGO_URI` (e.g. a CapRover one-click MongoDB: `mongodb://user:pass@srv-captain--mongodb:27017/haggag?authSource=admin`), `JWT_ACCESS_SECRET` + `JWT_REFRESH_SECRET` (`openssl rand -hex 32` each), `WEB_ORIGIN` + `ADMIN_ORIGIN` (the public https URLs), `COOKIE_SECURE=true`, `TRUST_PROXY=1`, `SWAGGER_ENABLED=false`. The api **refuses to boot** with missing/weak values — by design.
+   - **web** (build-time → baked into the bundle): `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_ADMIN_URL`; (runtime): `API_URL` — use the internal `http://srv-captain--haggag-api:4000` for server-side fetches. CapRover passes app env vars as build args, which the Dockerfile `ARG` lines pick up; **changing a `NEXT_PUBLIC_*` value requires a rebuild** (push or “Force Build”).
+   - **admin** (build-time): `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`.
+4. Enable HTTPS on all three apps. Keep web/admin/api on **one registrable domain** (e.g. `example.com`, `admin.example.com`, `api.example.com`) so the `SameSite=Lax` auth cookies flow; for cross-domain setups set `COOKIE_SAMESITE=none` on the api instead.
+5. Seed once the api is up: open the api app's terminal in CapRover (or `docker exec` on the server) and run `node dist/seed/seed.js` with `ADMIN_PASSWORD` set.
 
 ### `.env.prod` variables
 

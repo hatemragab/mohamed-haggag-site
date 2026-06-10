@@ -1,8 +1,12 @@
 # syntax=docker/dockerfile:1
 # ---------------------------------------------------------------------------
 # api/ — NestJS 11 production image (multi-stage, pnpm, non-root)
-#   build:  docker build -t haggag-api ./api
-#   run:    docker run -p 4000:4000 --env-file .env haggag-api
+#
+# Build context is the REPO ROOT (works for docker-compose AND CapRover,
+# whose context is always the repository root):
+#   build:  docker build -f api/Dockerfile -t haggag-api .
+#   run:    docker run -p 4000:4000 --env-file api/.env haggag-api
+# CapRover: root ./captain-definition (or ./captain-definition-api) points here.
 # ---------------------------------------------------------------------------
 
 FROM node:24-alpine AS base
@@ -13,18 +17,18 @@ WORKDIR /app
 # Only package.json + pnpm-lock.yaml here, so this layer caches across
 # source-only changes.
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
+COPY api/package.json api/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # --- build: compile TypeScript -> dist/ (includes dist/seed/seed.js) --------
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY api/ .
 RUN pnpm build
 
 # --- prod-deps: fresh install with production deps only ---------------------
 FROM base AS prod-deps
-COPY package.json pnpm-lock.yaml ./
+COPY api/package.json api/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
 # --- runtime: dist + prod node_modules, non-root -----------------------------
@@ -33,7 +37,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
-COPY --chown=node:node package.json ./
+COPY --chown=node:node api/package.json ./
 USER node
 EXPOSE 4000
 CMD ["node", "dist/main.js"]

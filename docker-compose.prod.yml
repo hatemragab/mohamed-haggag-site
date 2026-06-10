@@ -24,7 +24,10 @@ services:
       start_period: 20s
 
   api:
-    build: ./api
+    build:
+      # Repo root context — the Dockerfiles are written for it (CapRover-compatible).
+      context: .
+      dockerfile: api/Dockerfile
     container_name: haggag_prod_api
     restart: unless-stopped
     depends_on:
@@ -49,7 +52,8 @@ services:
 
   web:
     build:
-      context: ./web
+      context: .
+      dockerfile: web/Dockerfile
       args:
         # Baked into the browser bundle at build time — rebuild to change.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL in .env.prod}
@@ -67,7 +71,8 @@ services:
 
   admin:
     build:
-      context: ./admin
+      context: .
+      dockerfile: admin/Dockerfile
       args:
         # Baked into the browser bundle at build time — rebuild to change.
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?set NEXT_PUBLIC_API_URL in .env.prod}

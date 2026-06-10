@@ -2,10 +2,17 @@
 # ---------------------------------------------------------------------------
 # web/ — Next.js 16 student site, standalone output (multi-stage, non-root)
 #
-# NEXT_PUBLIC_* values are inlined into the client bundle at BUILD time, so
-# they must be passed as --build-arg (changing them requires a rebuild).
-# API_URL (server-side fetches) is read at RUNTIME — set it as a normal env
-# var on the container, no rebuild needed.
+# Build context is the REPO ROOT (works for docker-compose AND CapRover):
+#   build:  docker build -f web/Dockerfile -t haggag-web \
+#             --build-arg NEXT_PUBLIC_API_URL=https://api.example.com \
+#             --build-arg NEXT_PUBLIC_ADMIN_URL=https://admin.example.com .
+# CapRover: root ./captain-definition-web points here. Set NEXT_PUBLIC_API_URL
+# and NEXT_PUBLIC_ADMIN_URL as App Config env vars — CapRover passes app env
+# vars as build args, which the ARG lines below pick up.
+#
+# NEXT_PUBLIC_* values are inlined into the client bundle at BUILD time
+# (changing them requires a rebuild). API_URL (server-side fetches) is read at
+# RUNTIME — set it as a normal env var on the container, no rebuild needed.
 # ---------------------------------------------------------------------------
 
 FROM node:24-alpine AS base
@@ -14,14 +21,15 @@ WORKDIR /app
 
 # --- deps: cached install layer ----------------------------------------------
 FROM base AS deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # --- builder: next build (standalone) ----------------------------------------
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-# Baked into the browser bundle — override per environment with --build-arg.
+COPY web/ .
+# Baked into the browser bundle — override per environment with --build-arg
+# (or CapRover App Config env vars of the same name).
 ARG NEXT_PUBLIC_API_URL=http://localhost:4000
 ARG NEXT_PUBLIC_ADMIN_URL=http://localhost:3001
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
